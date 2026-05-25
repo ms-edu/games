@@ -828,14 +828,17 @@ document.getElementById("wheelSvgTeam").addEventListener("click", () => { if (!i
 // ========================
 function renderLeaderboard() {
   const lb = document.getElementById("leaderboard");
-  const sorted = [...teams].sort((a,b)=>b.score-a.score);
-  lb.innerHTML = sorted.map((t, rank) => {
-    const medal = rank===0?"🥇":rank===1?"🥈":rank===2?"🥉":`${rank+1}.`;
-    return `<div class="team-score-card" style="border-color:${t.color};background:${t.color}18;" id="lbcard-${teams.indexOf(t)}">
+  // Hitung ranking dari skor, urutan tampilan tetap sesuai urutan tim
+  const rankMap = {};
+  [...teams].map((t,i)=>({score:t.score,i})).sort((a,b)=>b.score-a.score)
+    .forEach((item, rank) => { rankMap[item.i] = rank; });
+  lb.innerHTML = teams.map((t, i) => {
+    const rank = rankMap[i];
+    const medal = rank===0?"🥇":rank===1?"🥈":rank===2?"🥉":"";
+    return `<div class="team-score-card" style="border-color:${t.color};background:${t.color}18;">
       <div class="flex items-center gap-2">
-        <span style="font-size:1.4rem;line-height:1;">${medal}</span>
         <div>
-          <p class="font-black text-sm" style="color:${t.color}">${escHtml(t.name)}</p>
+          <p class="font-black text-sm" style="color:${t.color}">${medal ? medal+" " : ""}${escHtml(t.name)}</p>
           <p class="text-xs font-bold text-[#5B4B73]">${t.members.length} siswa</p>
         </div>
       </div>
