@@ -26,6 +26,87 @@
     --red:       #ef4444;
   }
 
+  /* ===== THEME DEFINITIONS ===== */
+  /* Default: Samudra (Teal/Blue) */
+  body[data-theme="samudra"] {
+    --teal:      #38BDF8; --teal2: #0EA5E9; --teal3: #0284C7;
+    --teal-dark: #0a1a2a; --teal-mid: #0c2d4a; --teal-deep: #103960;
+    --gold: #F0C040; --gold2: #e6a800;
+    --glow-teal: 0 0 22px rgba(56,189,248,0.65);
+    --glow-gold: 0 0 20px rgba(240,192,64,0.6);
+  }
+  /* Emas Keemasan */
+  body[data-theme="emas"] {
+    --teal:      #F59E0B; --teal2: #D97706; --teal3: #B45309;
+    --teal-dark: #1a1200; --teal-mid: #2d1f00; --teal-deep: #3d2a00;
+    --gold: #FDE68A; --gold2: #fbbf24;
+    --glow-teal: 0 0 22px rgba(245,158,11,0.65);
+    --glow-gold: 0 0 20px rgba(253,230,138,0.6);
+  }
+  /* Zamrud Hijau */
+  body[data-theme="zamrud"] {
+    --teal:      #34D399; --teal2: #10B981; --teal3: #059669;
+    --teal-dark: #071a12; --teal-mid: #0d2b1e; --teal-deep: #133d2a;
+    --gold: #6EE7B7; --gold2: #34d399;
+    --glow-teal: 0 0 22px rgba(52,211,153,0.65);
+    --glow-gold: 0 0 20px rgba(110,231,183,0.6);
+  }
+  /* Ungu Saga */
+  body[data-theme="saga"] {
+    --teal:      #A78BFA; --teal2: #7C3AED; --teal3: #6D28D9;
+    --teal-dark: #0f0a1a; --teal-mid: #1e1040; --teal-deep: #2d1a60;
+    --gold: #DDD6FE; --gold2: #c4b5fd;
+    --glow-teal: 0 0 22px rgba(167,139,250,0.65);
+    --glow-gold: 0 0 20px rgba(221,214,254,0.6);
+  }
+  /* Merah Berani */
+  body[data-theme="berani"] {
+    --teal:      #F87171; --teal2: #EF4444; --teal3: #DC2626;
+    --teal-dark: #1a0808; --teal-mid: #2d0f0f; --teal-deep: #3d1515;
+    --gold: #FECACA; --gold2: #fca5a5;
+    --glow-teal: 0 0 22px rgba(248,113,113,0.65);
+    --glow-gold: 0 0 20px rgba(254,202,202,0.6);
+  }
+  /* Oranye Semangat */
+  body[data-theme="semangat"] {
+    --teal:      #FB923C; --teal2: #F97316; --teal3: #EA580C;
+    --teal-dark: #160a00; --teal-mid: #2a1400; --teal-deep: #3d1f00;
+    --gold: #FED7AA; --gold2: #fdba74;
+    --glow-teal: 0 0 22px rgba(251,146,60,0.65);
+    --glow-gold: 0 0 20px rgba(254,215,170,0.6);
+  }
+
+  /* ===== THEME SELECTOR WIDGET ===== */
+  .theme-selector-bar {
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap; justify-content: center;
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0; width: 100%;
+  }
+  .theme-bar-label {
+    font-size: 0.72rem; color: rgba(255,255,255,0.55);
+    letter-spacing: 1px; text-transform: uppercase; white-space: nowrap;
+  }
+  .theme-dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    cursor: pointer; border: 3px solid rgba(255,255,255,0.2);
+    transition: all 0.2s; flex-shrink: 0;
+    position: relative;
+  }
+  .theme-dot:hover { transform: scale(1.18); border-color: rgba(255,255,255,0.6); }
+  .theme-dot.active { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.6); }
+  .theme-dot[title]::after {
+    content: attr(title);
+    position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%); background: rgba(0,0,0,0.85);
+    color: #fff; font-size: 0.65rem; padding: 3px 7px;
+    border-radius: 5px; white-space: nowrap; pointer-events: none;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .theme-dot:hover::after { opacity: 1; }
+
   html, body {
     width: 100vw; height: 100vh;
     font-family: 'Cairo', sans-serif;
@@ -59,13 +140,12 @@
     justify-content: flex-start;
     padding-bottom: 24px;
   }
-
   .teacher-header {
     text-align: center;
-    padding: 20px 0 10px;
+    padding: 14px 0 0;
     flex-shrink: 0;
     width: 100%;
-    background: linear-gradient(180deg, rgba(16,57,96,0.9) 0%, transparent 100%);
+    background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%);
     position: sticky; top: 0; z-index: 20;
     backdrop-filter: blur(8px);
   }
@@ -643,6 +723,39 @@
   /* Hidden file input */
   #json-file-input { display: none; }
 
+  /* ===== TEAM GENERATOR ===== */
+  .team-gen-section {
+    margin-bottom: 10px; padding: 10px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+  }
+  .team-gen-label {
+    font-size: 0.75rem; color: var(--teal); letter-spacing: 1px;
+    text-transform: uppercase; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .gen-category-row {
+    display: grid; grid-template-columns: repeat(2,1fr); gap: 6px; margin-bottom: 8px;
+  }
+  .btn-gen-cat {
+    padding: 7px 10px; border-radius: 8px; font-size: 0.8rem;
+    font-family: 'Cairo', sans-serif; cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.75);
+    transition: all 0.2s; text-align: center;
+  }
+  .btn-gen-cat:hover { background: rgba(255,255,255,0.12); border-color: var(--teal); color: #fff; }
+  .btn-gen-cat.selected { background: rgba(var(--teal-rgb,56,189,248),0.15); border-color: var(--teal); color: var(--teal); font-weight: 700; }
+  .btn-gen-random {
+    width: 100%; padding: 8px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--teal), var(--teal3));
+    border: none; color: var(--teal-dark);
+    font-family: 'Cairo', sans-serif; font-size: 0.88rem; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 1px;
+  }
+  .btn-gen-random:hover { filter: brightness(1.1); transform: scale(1.02); }
+
   .info-tag {
     font-size: 0.72rem; color: #7db8d8; background: rgba(56,189,248,0.07);
     border: 1px solid rgba(56,189,248,0.15); border-radius: 6px;
@@ -659,6 +772,15 @@
     <div class="logo-icon">🕌</div>
     <div class="logo-title">JEOPARDY!</div>
     <div class="logo-subtitle">PANEL GURU – SETUP SOAL</div>
+    <div class="theme-selector-bar" id="theme-bar-teacher">
+      <span class="theme-bar-label">🎨 Tema:</span>
+      <div class="theme-dot active" data-theme="samudra" title="Samudra" style="background:linear-gradient(135deg,#38BDF8,#0284C7)" onclick="applyTheme('samudra')"></div>
+      <div class="theme-dot" data-theme="emas" title="Emas" style="background:linear-gradient(135deg,#F59E0B,#B45309)" onclick="applyTheme('emas')"></div>
+      <div class="theme-dot" data-theme="zamrud" title="Zamrud" style="background:linear-gradient(135deg,#34D399,#059669)" onclick="applyTheme('zamrud')"></div>
+      <div class="theme-dot" data-theme="saga" title="Saga" style="background:linear-gradient(135deg,#A78BFA,#6D28D9)" onclick="applyTheme('saga')"></div>
+      <div class="theme-dot" data-theme="berani" title="Berani" style="background:linear-gradient(135deg,#F87171,#DC2626)" onclick="applyTheme('berani')"></div>
+      <div class="theme-dot" data-theme="semangat" title="Semangat" style="background:linear-gradient(135deg,#FB923C,#EA580C)" onclick="applyTheme('semangat')"></div>
+    </div>
   </div>
   <div class="teacher-body">
 
@@ -702,6 +824,15 @@
     <div class="logo-icon2">🕌</div>
     <div class="logo-title2" id="setup-game-title">JEOPARDY!</div>
     <div class="logo-subtitle2" id="setup-game-subtitle">FIKIH KELAS 4 MI</div>
+    <div class="theme-selector-bar" style="margin-top:8px">
+      <span class="theme-bar-label">🎨 Tema:</span>
+      <div class="theme-dot active" data-theme="samudra" title="Samudra" style="background:linear-gradient(135deg,#38BDF8,#0284C7)" onclick="applyTheme('samudra')"></div>
+      <div class="theme-dot" data-theme="emas" title="Emas" style="background:linear-gradient(135deg,#F59E0B,#B45309)" onclick="applyTheme('emas')"></div>
+      <div class="theme-dot" data-theme="zamrud" title="Zamrud" style="background:linear-gradient(135deg,#34D399,#059669)" onclick="applyTheme('zamrud')"></div>
+      <div class="theme-dot" data-theme="saga" title="Saga" style="background:linear-gradient(135deg,#A78BFA,#6D28D9)" onclick="applyTheme('saga')"></div>
+      <div class="theme-dot" data-theme="berani" title="Berani" style="background:linear-gradient(135deg,#F87171,#DC2626)" onclick="applyTheme('berani')"></div>
+      <div class="theme-dot" data-theme="semangat" title="Semangat" style="background:linear-gradient(135deg,#FB923C,#EA580C)" onclick="applyTheme('semangat')"></div>
+    </div>
   </div>
   <div class="setup-body">
     <div class="setup-card">
@@ -710,6 +841,17 @@
     </div>
     <div class="setup-card">
       <h2>👥 Daftar Tim</h2>
+      <!-- Team Generator -->
+      <div class="team-gen-section">
+        <div class="team-gen-label"><span>✨</span> Generator Nama Otomatis</div>
+        <div class="gen-category-row">
+          <button class="btn-gen-cat selected" data-cat="pahlawan" onclick="selectGenCat(this,'pahlawan')">🇮🇩 Pahlawan Nasional</button>
+          <button class="btn-gen-cat" data-cat="sahabat" onclick="selectGenCat(this,'sahabat')">🌙 Sahabat Nabi</button>
+          <button class="btn-gen-cat" data-cat="ulama" onclick="selectGenCat(this,'ulama')">📚 Ulama Islam</button>
+          <button class="btn-gen-cat" data-cat="sarjana" onclick="selectGenCat(this,'sarjana')">🏛️ Sarjana Islam</button>
+        </div>
+        <button class="btn-gen-random" onclick="generateTeamNames()">🎲 Generate Nama Tim Sekarang</button>
+      </div>
       <div class="team-list" id="team-list"></div>
       <button class="btn-add-team" onclick="addTeam()">+ Tambah Tim</button>
     </div>
@@ -782,6 +924,80 @@
 </div>
 
 <script>
+// ============================================================
+//  THEME SELECTOR
+// ============================================================
+const THEMES = ['samudra','emas','zamrud','saga','berani','semangat'];
+let currentTheme = 'samudra';
+
+function applyTheme(theme) {
+  document.body.setAttribute('data-theme', theme);
+  currentTheme = theme;
+  document.querySelectorAll('.theme-dot').forEach(d => {
+    d.classList.toggle('active', d.dataset.theme === theme);
+  });
+}
+
+// Init theme on load
+document.body.setAttribute('data-theme', 'samudra');
+
+// ============================================================
+//  TEAM NAME GENERATOR
+// ============================================================
+const TEAM_NAME_POOLS = {
+  pahlawan: [
+    'Diponegoro','Kartini','Soekarno','Hatta','Sudirman',
+    'Cut Nyak Dien','Imam Bonjol','Pattimura','Teuku Umar','Dewi Sartika',
+    'Ki Hajar Dewantara','Sisingamangaraja','Sultan Agung','Hasanuddin','Gajah Mada',
+    'Bung Tomo','Martha Christina Tiahahu','Nyi Ageng Serang','Pangeran Antasari','Achmad Yani'
+  ],
+  sahabat: [
+    'Abu Bakar','Umar','Utsman','Ali','Bilal',
+    'Salman Al-Farisi','Abu Ubaidah','Khalid bin Walid','Amr bin Ash','Zaid bin Tsabit',
+    'Abdullah bin Masud','Muaz bin Jabal','Abu Hurairah','Anas bin Malik','Jabir',
+    'Abdurrahman bin Auf','Saad bin Abi Waqqash','Thalhah','Zubair','Hudzaifah'
+  ],
+  ulama: [
+    'Imam Syafii','Imam Malik','Imam Ahmad','Imam Nawawi','Ibn Hajar',
+    'Al-Ghazali','Ibn Qudamah','Ibn Taimiyah','Ibnul Qayyim','As-Suyuti',
+    'Yahya bin Sharaf','Al-Baihaqi','Ibn Kathir','Al-Qurtubi','Az-Zarkasyi',
+    'Ibn Rajab','Al-Izz bin Abdissalam','Asy-Syathibi','Al-Muzani','Ibn Hibban'
+  ],
+  sarjana: [
+    'Ibn Sina','Al-Khawarizmi','Al-Biruni','Ibn Rushd','Al-Farabi',
+    'Ibn Khaldun','Al-Idrisi','Jabir ibn Hayyan','Al-Battani','Ibn al-Haytham',
+    'Al-Zahrawi','Al-Masudi','Ibn Jubayr','Al-Jahiz','Ibn Bajjah',
+    'Al-Kindi','Thabit bin Qurra','Al-Razi','Ibn Zuhr','Al-Mawardi'
+  ]
+};
+
+let selectedGenCat = 'pahlawan';
+
+function selectGenCat(btn, cat) {
+  selectedGenCat = cat;
+  document.querySelectorAll('.btn-gen-cat').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function generateTeamNames() {
+  const list = document.getElementById('team-list');
+  const existingCount = list.children.length;
+  const count = existingCount > 0 ? existingCount : 4;
+  const pool = [...TEAM_NAME_POOLS[selectedGenCat]];
+  // Shuffle pool
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  // Clear and rebuild
+  list.innerHTML = '';
+  const catEmojis = { pahlawan:'🇮🇩', sahabat:'🌙', ulama:'📚', sarjana:'🏛️' };
+  const emoji = catEmojis[selectedGenCat];
+  for (let i = 0; i < count && i < pool.length; i++) {
+    addTeam(`${emoji} ${pool[i]}`);
+  }
+}
+
 // ============================================================
 //  TEAM COLORS
 // ============================================================
@@ -1089,8 +1305,7 @@ function goToPlayerSetup() {
 
   // Init teams if empty
   if (document.getElementById('team-list').children.length === 0) {
-    addTeam('Tim Merah');
-    addTeam('Tim Biru');
+    generateTeamNames();
   }
 
   showScreen('setup-screen');
@@ -1171,9 +1386,8 @@ function onTimerExpired() {
       showFeedback('⏰ WAKTU HABIS!', false);
       setTimeout(() => {
         hideFeedback();
-        closeQuestion();
         state.currentTurnIdx = (state.currentTurnIdx + 1) % state.activeTeams.length;
-        renderBoard();
+        closeQuestion();
         checkRoundEnd();
       }, 2000);
     }, 1200);
@@ -1429,9 +1643,8 @@ function selectAnswer(choiceIdx) {
 
   setTimeout(() => {
     hideFeedback();
-    closeQuestion();
     state.currentTurnIdx = (state.currentTurnIdx + 1) % state.activeTeams.length;
-    renderBoard();
+    closeQuestion();
     checkRoundEnd();
   }, 2200);
 }
