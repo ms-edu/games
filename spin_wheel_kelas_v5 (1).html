@@ -1,0 +1,1282 @@
+<!doctype html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spin The Wheel Kelas v4</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Nunito:wght@500;700;800;900&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    html,body{height:100%;width:100%;margin:0;padding:0;overflow:hidden;}
+    *{box-sizing:border-box;}
+    body{font-family:"Nunito",sans-serif;background:#FFF4D8;color:#24163F;}
+
+    .soft-grid{
+      background-image:linear-gradient(rgba(42,24,92,.06)1px,transparent 1px),linear-gradient(90deg,rgba(42,24,92,.06)1px,transparent 1px);
+      background-size:28px 28px;
+    }
+    input[type="file"]{display:none;}
+
+    /* ===== PAGE SYSTEM ===== */
+    .page{display:none;height:100%;width:100%;}
+    .page.active{display:flex;}
+    #setupPage{flex-direction:column;overflow:hidden;}
+    #gamePage{flex-direction:column;overflow:hidden;}
+
+    /* ===== TABS (Setup) ===== */
+    .tab-btn{padding:.5rem 1.25rem;font-weight:900;font-size:.9rem;border-radius:999px;border:3px solid #24163F;cursor:pointer;transition:all .15s;background:white;color:#24163F;}
+    .tab-btn.active{background:#24163F;color:white;}
+
+    /* ===== MODE CARDS ===== */
+    .mode-card{border:4px solid #24163F;border-radius:1.5rem;padding:1.5rem;cursor:pointer;background:white;transition:all .15s;box-shadow:6px 6px 0 #24163F;}
+    .mode-card:hover{transform:translateY(-3px);box-shadow:8px 10px 0 #24163F;}
+    .mode-card.selected{background:#24163F;color:white;transform:translateY(-2px);}
+    .mode-card.selected .mode-desc{color:#c4b9e0;}
+
+    /* ===== TEAM ASSIGN TABLE (legacy) ===== */
+    .team-select{border:2px solid #24163F;border-radius:.5rem;padding:.25rem .5rem;font-weight:800;font-size:.8rem;background:white;cursor:pointer;}
+
+    /* ===== TEAM CARDS (visual assign) ===== */
+    .team-card{border:3px solid #24163F;border-radius:1.25rem;background:white;overflow:hidden;box-shadow:4px 4px 0 #24163F;}
+    .team-card-header{padding:.55rem .85rem;display:flex;align-items:center;gap:.6rem;}
+    .team-card-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;border:2px solid rgba(0,0,0,.2);}
+    .team-card-name{font-weight:900;font-size:.85rem;flex:1;}
+    .team-card-count{font-size:.7rem;font-weight:800;background:rgba(0,0,0,.15);border-radius:999px;padding:2px 8px;}
+    .team-card-body{padding:.5rem .75rem .75rem;display:flex;flex-wrap:wrap;gap:.35rem;min-height:2.5rem;}
+    .student-chip{border-radius:999px;padding:3px 10px;font-size:.72rem;font-weight:900;cursor:pointer;border:2px solid transparent;transition:all .12s;display:flex;align-items:center;gap:4px;white-space:nowrap;color:white;}
+    .student-chip:hover{filter:brightness(.85);transform:scale(1.07);}
+    .student-chip-placeholder{color:#aaa;font-size:.72rem;font-weight:700;font-style:italic;}
+
+    /* ===== GAME LAYOUT ===== */
+    #gameHeader{flex-shrink:0;padding:.5rem 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid rgba(36,22,63,.12);}
+    #gameMain{flex:1;display:flex;overflow:hidden;min-height:0;}
+
+    /* PERSONAL MODE */
+    #personalLayout{width:100%;display:flex;overflow:hidden;}
+    #personalLeft{width:70%;display:flex;flex-direction:column;align-items:center;padding:.5rem 1rem .75rem 1.25rem;gap:.5rem;overflow:hidden;}
+    #personalRight{width:30%;display:flex;flex-direction:column;padding:.5rem 1.25rem .75rem .75rem;gap:.5rem;overflow:hidden;border-left:2px solid rgba(36,22,63,.12);}
+
+    /* TEAM MODE */
+    #teamLayout{width:100%;display:flex;overflow:hidden;}
+    #teamLeft{width:55%;display:flex;flex-direction:column;align-items:center;padding:.5rem 1rem .75rem 1.25rem;gap:.5rem;overflow:hidden;}
+    #teamRight{width:45%;display:flex;flex-direction:column;padding:.5rem 1.25rem .75rem .75rem;gap:.5rem;overflow:hidden;border-left:2px solid rgba(36,22,63,.12);}
+
+    .scroll-panel{overflow-y:auto;flex:1;}
+    .scroll-panel::-webkit-scrollbar{width:5px;}
+    .scroll-panel::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px;}
+
+    /* ===== CHIPS ===== */
+    .chip{border-radius:999px;padding:4px 12px;font-size:12px;font-weight:900;}
+    .chip-teal{background:#14B8A6;color:white;}
+    .chip-red{background:#E11D48;color:white;}
+    .chip-gray{background:#e5e7eb;color:#374151;font-size:11px;}
+    .chip-purple{background:#7C3AED;color:white;}
+    .chip-orange{background:#F97316;color:white;}
+
+    /* ===== TEAM SCORE CARD ===== */
+    .team-score-card{border:3px solid;border-radius:1rem;padding:.6rem .85rem;display:flex;align-items:center;justify-content:space-between;transition:all .2s;}
+    .team-score-card.highlight{transform:scale(1.02);box-shadow:0 0 20px rgba(0,0,0,.2);}
+
+    /* ===== MODAL BASE ===== */
+    .fullmodal{position:fixed;inset:0;z-index:100;background:rgba(8,4,24,.93);display:none;align-items:center;justify-content:center;}
+    .fullmodal.open{display:flex;}
+    .modal-inner{width:96vw;height:94vh;max-width:1400px;display:flex;flex-direction:column;background:#0F0A1E;border:4px solid rgba(255,255,255,.15);border-radius:2rem;overflow:hidden;animation:modalPop .4s cubic-bezier(.2,1.2,.2,1) both;}
+    @keyframes modalPop{from{transform:scale(.92);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+    /* Winner bar */
+    .modal-winner-bar{flex-shrink:0;padding:1.25rem 2rem;display:flex;align-items:center;justify-content:center;gap:1rem;position:relative;}
+    .winner-label{font-family:"Fraunces",serif;font-size:clamp(2rem,4.5vw,3.5rem);font-weight:900;color:white;text-align:center;text-shadow:0 3px 12px rgba(0,0,0,.4);line-height:1.1;}
+    /* Personal mode: gradient */
+    .modal-winner-bar.personal-bar{background:linear-gradient(135deg,#7C3AED 0%,#EC4899 50%,#F97316 100%);}
+
+    /* Rebut bar (team mode only) */
+    #rebutBar{flex-shrink:0;background:#1a0d30;border-top:2px solid rgba(255,255,255,.1);padding:0 2rem;gap:.75rem;align-items:center;justify-content:center;flex-wrap:wrap;max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease;display:flex;}
+    #rebutBar.visible{max-height:120px;padding:.75rem 2rem;}
+
+    /* Question */
+    .modal-question-bar{flex-shrink:0;background:#1E1340;border-top:2px solid rgba(255,255,255,.08);border-bottom:2px solid rgba(255,255,255,.08);padding:1.25rem 2.5rem;display:flex;align-items:center;justify-content:center;}
+    .question-text{font-family:"Nunito",sans-serif;font-size:clamp(1.3rem,2.5vw,2.2rem);font-weight:900;color:#FFF;text-align:center;line-height:1.4;max-width:1100px;}
+
+    /* Timer */
+    .timer-bar-wrap{flex-shrink:0;padding:.5rem 2.5rem;background:#150D30;display:flex;align-items:center;gap:1rem;}
+    .timer-track{flex:1;height:14px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden;}
+    .timer-fill{height:100%;width:100%;border-radius:999px;background:linear-gradient(90deg,#10B981,#FACC15,#F97316,#E11D48);transform-origin:left;transition:transform 1s linear;}
+    .timer-countdown{flex-shrink:0;font-family:"Fraunces",serif;font-size:2rem;font-weight:900;color:white;min-width:3rem;text-align:right;line-height:1;}
+    .timer-countdown.warning{color:#F97316;}
+    .timer-countdown.danger{color:#E11D48;animation:timerPulse .5s ease infinite alternate;}
+    @keyframes timerPulse{from{transform:scale(1);}to{transform:scale(1.15);}}
+
+    /* Options */
+    .modal-options-area{flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:1.25rem 2.5rem;background:#0F0A1E;}
+    .options-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;width:100%;max-width:1200px;height:100%;}
+    .option-btn{background:#1E1340;border:3px solid rgba(255,255,255,.18);border-radius:1.25rem;padding:1rem 1.5rem;font-family:"Nunito",sans-serif;font-weight:900;color:white;cursor:pointer;transition:transform .12s,background .12s,border-color .12s,box-shadow .12s;display:flex;align-items:center;gap:1rem;text-align:left;width:100%;height:100%;}
+    .option-btn:hover:not(:disabled){transform:scale(1.02);background:#2D1A5C;border-color:rgba(255,255,255,.5);box-shadow:0 0 30px rgba(139,92,246,.4);}
+    .option-btn.correct{background:#064E3B!important;border-color:#10B981!important;box-shadow:0 0 40px rgba(16,185,129,.5)!important;color:#A7F3D0!important;}
+    .option-btn.correct .option-badge{background:#10B981;color:white;}
+    .option-btn.wrong{background:#4C0519!important;border-color:#F43F5E!important;box-shadow:0 0 40px rgba(244,63,94,.4)!important;color:#FDA4AF!important;}
+    .option-btn.wrong .option-badge{background:#F43F5E;color:white;}
+    .option-btn:disabled{cursor:default;}
+    .option-badge{flex-shrink:0;width:3rem;height:3rem;border-radius:50%;background:rgba(255,255,255,.15);color:white;font-size:1.25rem;font-weight:900;display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s;}
+    .option-text{font-size:clamp(1rem,2vw,1.7rem);line-height:1.3;font-weight:800;}
+
+    /* Arabic */
+    .text-arabic{font-family:"Amiri",serif;direction:rtl;unicode-bidi:embed;}
+    .text-mixed{font-family:"Amiri","Nunito",sans-serif;direction:ltr;unicode-bidi:embed;}
+
+    /* ===== CELEBRATION ===== */
+    #celebrationOverlay{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;pointer-events:none;}
+    #celebrationOverlay.show{display:flex;}
+    .celebration-backdrop{position:absolute;inset:0;animation:backdropFade 2.8s ease forwards;}
+    @keyframes backdropFade{0%{opacity:0;}15%{opacity:1;}70%{opacity:1;}100%{opacity:0;}}
+    .celebration-backdrop.correct-bg{background:radial-gradient(ellipse at center,rgba(5,150,105,.7)0%,rgba(0,0,0,.5)70%);}
+    .celebration-backdrop.wrong-bg{background:radial-gradient(ellipse at center,rgba(225,29,72,.6)0%,rgba(0,0,0,.5)70%);}
+    .celebration-box{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:1rem;animation:celebPop .45s cubic-bezier(.2,1.3,.2,1) both,celebFade 2.8s ease forwards;}
+    @keyframes celebPop{from{transform:scale(.3);opacity:0;}to{transform:scale(1);opacity:1;}}
+    @keyframes celebFade{0%{opacity:0;}15%{opacity:1;}70%{opacity:1;}100%{opacity:0;}}
+    .celeb-icon{font-size:clamp(5rem,15vw,12rem);line-height:1;filter:drop-shadow(0 0 40px rgba(255,255,255,.6));animation:iconBounce .6s ease infinite alternate;}
+    @keyframes iconBounce{from{transform:translateY(0) scale(1);}to{transform:translateY(-12px) scale(1.05);}}
+    .celeb-text{font-family:"Fraunces",serif;font-size:clamp(3rem,8vw,7rem);font-weight:900;text-align:center;line-height:1.1;filter:drop-shadow(0 4px 20px rgba(0,0,0,.5));}
+    .celeb-text.correct{color:#A7F3D0;}
+    .celeb-text.wrong{color:#FDA4AF;}
+    .celeb-sub{font-size:clamp(1.2rem,2.5vw,2rem);font-weight:800;opacity:.85;}
+    .celeb-sub.correct{color:#D1FAE5;}
+    .celeb-sub.wrong{color:#FFE4E6;}
+
+    /* Confetti */
+    @keyframes confettiFall{0%{transform:translateY(-10vh) rotate(0deg) scale(1);opacity:1;}85%{opacity:1;}100%{transform:translateY(110vh) rotate(900deg) scale(.5);opacity:0;}}
+    .confetti-piece{position:fixed;pointer-events:none;border-radius:3px;animation:confettiFall linear forwards;z-index:205;}
+
+    /* Toast */
+    @keyframes toastIn{from{transform:translateY(30%) translateX(-50%);opacity:0;}to{transform:translateY(0) translateX(-50%);opacity:1;}}
+
+    /* REBUT button */
+    .rebut-btn{border:3px solid;border-radius:1rem;padding:.5rem 1.25rem;font-weight:900;font-size:.9rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.5rem;}
+    .rebut-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.4);}
+    .rebut-btn:disabled{opacity:.4;cursor:default;}
+  </style>
+</head>
+<body class="h-full w-full soft-grid">
+
+<!-- ========== SETUP PAGE ========== -->
+<div id="setupPage" class="page active">
+  <header class="flex-shrink-0 px-5 pt-4 pb-3">
+    <div class="mx-auto max-w-5xl flex items-center justify-between rounded-[2rem] border-4 border-[#24163F] bg-white px-5 py-3 shadow-[8px_8px_0_#24163F]">
+      <div>
+        <span class="inline-flex items-center gap-1 rounded-full bg-[#F97316] px-3 py-1 text-xs font-black text-white mb-1">✨ Game Kelas Interaktif v4</span>
+        <h1 class="font-black text-2xl leading-tight" style="font-family:Fraunces,serif;">Spin The Wheel Kelas</h1>
+        <p class="text-xs font-bold text-[#5B4B73]">Mode Personal & Tim · Soal pilihan ganda · Leaderboard real-time</p>
+      </div>
+      <button id="startGameBtn" disabled class="rounded-2xl border-4 border-[#24163F] bg-[#E11D48] px-6 py-3 font-black text-white shadow-[4px_4px_0_#24163F] transition hover:-translate-y-1 disabled:opacity-40 disabled:cursor-not-allowed text-base flex items-center gap-2">
+        ▶ Mulai Game
+      </button>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <div class="flex-shrink-0 mx-auto w-full max-w-5xl px-5 pt-1 pb-2 flex gap-2">
+    <button class="tab-btn active" data-tab="mode">1. Mode</button>
+    <button class="tab-btn" data-tab="students">2. Siswa</button>
+    <button class="tab-btn" data-tab="questions">3. Soal</button>
+  </div>
+
+  <main class="flex-1 overflow-auto px-5 pb-5 mx-auto w-full max-w-5xl">
+
+    <!-- TAB: MODE -->
+    <div id="tab-mode" class="tab-pane">
+      <div class="grid md:grid-cols-2 gap-5">
+        <div class="mode-card selected" data-mode="personal">
+          <div class="text-4xl mb-3">👤</div>
+          <h3 class="font-black text-xl mb-1" style="font-family:Fraunces,serif;">Mode Personal</h3>
+          <p class="mode-desc font-bold text-sm text-[#5B4B73]">Wheel berisi nama siswa. Setiap siswa menjawab soal sendiri. Rekap jawaban per siswa di akhir.</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class="chip chip-teal">Wheel nama siswa</span>
+            <span class="chip chip-gray">Rekap per siswa</span>
+          </div>
+        </div>
+        <div class="mode-card" data-mode="team">
+          <div class="text-4xl mb-3">🏆</div>
+          <h3 class="font-black text-xl mb-1" style="font-family:Fraunces,serif;">Mode Tim</h3>
+          <p class="mode-desc font-bold text-sm text-[#5B4B73]">Wheel berisi nama tim. Jika salah, tim lain bisa rebut soal! Leaderboard skor real-time.</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class="chip chip-purple">Wheel nama tim</span>
+            <span class="chip chip-orange">Rebut soal (+100 poin)</span>
+            <span class="chip chip-red">Leaderboard</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team config (only show when team mode selected) -->
+      <div id="teamConfig" class="hidden mt-5 rounded-[1.5rem] border-4 border-[#24163F] bg-white p-5 shadow-[6px_6px_0_#24163F]">
+        <h3 class="font-black text-lg mb-3">⚙️ Konfigurasi Tim</h3>
+        <div class="flex items-center gap-3 mb-4 flex-wrap">
+          <label class="font-black text-sm">Jumlah Tim:</label>
+          <div class="flex gap-2">
+            <button class="team-count-btn tab-btn active" data-n="2">2</button>
+            <button class="team-count-btn tab-btn" data-n="3">3</button>
+            <button class="team-count-btn tab-btn" data-n="4">4</button>
+            <button class="team-count-btn tab-btn" data-n="5">5</button>
+            <button class="team-count-btn tab-btn" data-n="6">6</button>
+          </div>
+        </div>
+        <div id="teamNamesContainer" class="flex flex-wrap gap-3"></div>
+        <p class="text-xs font-bold text-[#5B4B73] mt-3">💡 Nama tim bisa diubah. Di tab Siswa, siswa dibagi otomatis — klik nama siswa untuk pindahkan ke tim berikutnya.</p>
+      </div>
+    </div>
+
+    <!-- TAB: STUDENTS -->
+    <div id="tab-students" class="tab-pane hidden">
+      <div class="rounded-[2rem] border-4 border-[#24163F] bg-white p-5 shadow-[8px_8px_0_#24163F] flex flex-col gap-4">
+        <h2 class="font-black text-xl">📚 Daftar Siswa</h2>
+        <div class="flex gap-3 flex-wrap">
+          <label for="studentFile" class="cursor-pointer rounded-2xl border-4 border-[#24163F] bg-[#14B8A6] px-5 py-3 font-black text-white shadow-[4px_4px_0_#24163F] transition hover:-translate-y-1 text-sm">
+            ⬆ Import siswa (.txt/.csv)
+          </label>
+          <input id="studentFile" type="file" accept=".txt,.csv">
+          <button id="manualStudentBtn" class="rounded-2xl border-4 border-[#24163F] bg-white px-5 py-3 font-black text-sm text-[#24163F] shadow-[4px_4px_0_#24163F] transition hover:-translate-y-1">
+            ✏️ Input Manual
+          </button>
+        </div>
+
+        <!-- Manual input area -->
+        <div id="manualStudentArea" class="hidden">
+          <textarea id="manualStudentText" rows="5" class="w-full border-2 border-[#24163F] rounded-xl p-3 font-bold text-sm resize-none" placeholder="Satu nama per baris atau dipisah koma:&#10;Andi Pratama&#10;Budi Santoso, Citra Dewi"></textarea>
+          <button id="applyManualStudent" class="mt-2 rounded-xl border-3 border-[#24163F] bg-[#14B8A6] px-4 py-2 font-black text-sm text-white shadow-[3px_3px_0_#24163F] hover:-translate-y-1 transition">Terapkan</button>
+        </div>
+
+        <!-- Student preview + team assign -->
+        <div id="studentPreview" class="hidden">
+          <div id="personalStudentPreview">
+            <p class="font-black text-sm text-[#24163F] mb-2" id="studentCountLabel">✓ 0 siswa terimport:</p>
+            <div id="studentPreviewList" class="flex flex-wrap gap-2 max-h-32 overflow-auto"></div>
+          </div>
+          <div id="teamAssignArea" class="hidden mt-4">
+            <div class="flex items-center justify-between mb-3">
+              <p class="font-black text-sm">🃏 Kartu Tim — klik nama siswa untuk pindah tim:</p>
+              <button id="autoDistributeBtn" class="rounded-xl border-2 border-[#24163F] bg-[#7C3AED] px-3 py-1.5 font-black text-xs text-white shadow-[2px_2px_0_#24163F] hover:-translate-y-0.5 transition">
+                🔀 Acak Ulang
+              </button>
+            </div>
+            <div id="teamCardsGrid" class="grid gap-3" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr));"></div>
+          </div>
+        </div>
+
+        <details class="rounded-xl border-2 border-[#24163F] bg-[#FFF4D8] p-3 text-xs">
+          <summary class="cursor-pointer font-black">Format file siswa</summary>
+          <div class="mt-2 font-bold text-[#5B4B73] space-y-1">
+            <p>Satu nama per baris atau dipisah koma:</p>
+            <code class="block bg-white p-2 rounded">Andi Pratama<br>Budi Santoso, Citra Dewi</code>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- TAB: QUESTIONS -->
+    <div id="tab-questions" class="tab-pane hidden">
+      <div class="rounded-[2rem] border-4 border-[#24163F] bg-white p-5 shadow-[8px_8px_0_#24163F] flex flex-col gap-4">
+        <h2 class="font-black text-xl">❓ Daftar Soal</h2>
+        <label for="questionFile" class="block cursor-pointer rounded-2xl border-4 border-[#24163F] bg-[#F97316] p-4 text-center font-black text-white shadow-[4px_4px_0_#24163F] transition hover:-translate-y-1 text-sm">
+          ⬆ Import soal (.txt / .csv / .json)
+        </label>
+        <input id="questionFile" type="file" accept=".txt,.csv,.json">
+        <div id="questionPreview" class="hidden">
+          <p class="font-black text-sm text-[#24163F] mb-2" id="questionCountLabel">✓ 0 soal dimuat:</p>
+          <div id="questionPreviewList" class="space-y-2 max-h-64 overflow-auto"></div>
+        </div>
+        <details class="rounded-xl border-2 border-[#24163F] bg-[#FFF4D8] p-3 text-xs">
+          <summary class="cursor-pointer font-black">Format file soal</summary>
+          <div class="mt-2 font-bold text-[#5B4B73]">
+            <p class="mb-1">Format TXT/CSV: <code>Pertanyaan|A|B|C|D|Jawaban</code></p>
+            <code class="block bg-white p-2 rounded">Ibu kota Indonesia?|Jakarta|Bandung|Surabaya|Medan|Jakarta</code>
+            <p class="mt-2 mb-1">Format JSON:</p>
+            <code class="block bg-white p-2 rounded">[{"question":"...","options":["A","B"],"answer":"A"}]</code>
+          </div>
+        </details>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ========== GAME PAGE ========== -->
+<div id="gamePage" class="page soft-grid" style="background:#FFF4D8;">
+  <!-- Game header -->
+  <div id="gameHeader">
+    <h1 class="font-black text-xl leading-tight" style="font-family:Fraunces,serif;">🎡 Spin The Wheel <span id="gameModeLabel" class="text-sm font-black rounded-full bg-[#24163F] text-white px-3 py-1"></span></h1>
+    <div class="flex gap-2">
+      <button id="resetGameBtn" class="inline-flex items-center gap-1 rounded-xl border-2 border-[#24163F] bg-white px-3 py-2 font-black text-sm text-[#24163F] shadow-[2px_2px_0_#24163F] transition hover:-translate-y-1">↺ Reset</button>
+      <button id="printBtn" class="inline-flex items-center gap-1 rounded-xl border-2 border-[#24163F] bg-[#7C3AED] px-3 py-2 font-black text-sm text-white shadow-[2px_2px_0_#24163F] transition hover:-translate-y-1">🖨 Print</button>
+      <button id="exitGameBtn" class="inline-flex items-center gap-1 rounded-xl border-2 border-[#24163F] bg-[#E11D48] px-3 py-2 font-black text-sm text-white shadow-[2px_2px_0_#24163F] transition hover:-translate-y-1">✕ Keluar</button>
+    </div>
+  </div>
+  <div id="gameMain">
+
+    <!-- PERSONAL LAYOUT -->
+    <div id="personalLayout" style="display:none;">
+      <div id="personalLeft">
+        <div style="flex:1;width:100%;display:flex;align-items:center;justify-content:center;position:relative;min-height:0;">
+          <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10;width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:34px solid #E11D48;filter:drop-shadow(0 3px 8px rgba(0,0,0,.3));"></div>
+          <svg id="wheelSvgPersonal" viewBox="0 0 500 500" style="width:100%;height:100%;max-width:min(calc(65vw - 2rem),calc(100vh - 220px));max-height:min(calc(65vw - 2rem),calc(100vh - 220px));filter:drop-shadow(0 20px 35px rgba(42,24,92,.22));cursor:pointer;" role="img">
+            <circle cx="250" cy="250" r="235" fill="#FFF4D8" stroke="#24163F" stroke-width="8"/>
+            <g id="sliceGroupPersonal"></g>
+            <circle cx="250" cy="250" r="52" fill="#fff" stroke="#24163F" stroke-width="7"/>
+            <text x="250" y="244" text-anchor="middle" font-weight="900" font-size="17" fill="#24163F" font-family="Nunito,sans-serif">SPIN</text>
+            <text x="250" y="262" text-anchor="middle" font-weight="900" font-size="11" fill="#E11D48" font-family="Nunito,sans-serif">CLASS</text>
+          </svg>
+        </div>
+        <div class="flex gap-3 w-full justify-center flex-shrink-0">
+          <button id="spinBtnPersonal" class="flex-1 max-w-[200px] inline-flex items-center justify-center gap-2 rounded-2xl border-4 border-[#24163F] bg-[#E11D48] px-6 py-3 font-black text-white shadow-[4px_4px_0_#24163F] transition hover:-translate-y-1 disabled:opacity-50 text-base">
+            🔄 Putar!
+          </button>
+          <button id="skipBtnPersonal" class="inline-flex items-center gap-1 rounded-2xl border-4 border-[#24163F] bg-[#F97316] px-4 py-3 font-black text-white shadow-[4px_4px_0_#24163F] transition hover:-translate-y-1 text-sm">
+            ⏩ Lewati
+          </button>
+        </div>
+      </div>
+      <div id="personalRight">
+        <div class="flex items-center justify-between flex-shrink-0">
+          <h2 class="font-black text-sm" style="font-family:Fraunces,serif;">📊 Rekap Jawaban</h2>
+        </div>
+        <div class="flex gap-2 flex-wrap flex-shrink-0">
+          <span class="chip chip-teal">🟢 Wheel: <span id="activeCountP">0</span></span>
+          <span class="chip chip-red">🔴 Dipilih: <span id="pickedCountP">0</span></span>
+        </div>
+        <div class="flex-1 rounded-[1.25rem] border-4 border-[#24163F] bg-white shadow-[4px_4px_0_#24163F] flex flex-col overflow-hidden">
+          <div id="personalAnswersList" class="scroll-panel flex-1 p-3 space-y-2"></div>
+          <div id="personalAnswersEmpty" class="flex-1 flex items-center justify-center p-4">
+            <p class="font-black text-xs text-center text-[#5B4B73]">Belum ada siswa<br>yang menjawab</p>
+          </div>
+        </div>
+        <div class="rounded-xl border-2 border-[#24163F] bg-white p-3 shadow-[3px_3px_0_#24163F] flex-shrink-0">
+          <div class="flex justify-between text-xs font-black text-[#24163F] mb-1"><span>✓ Benar</span><span>✗ Salah</span></div>
+          <div class="flex gap-1 h-3 rounded-full overflow-hidden bg-[#f3f4f6]">
+            <div id="pScoreBarCorrect" style="width:0%;background:#14B8A6;transition:width .4s;"></div>
+            <div id="pScoreBarWrong" style="width:0%;background:#E11D48;transition:width .4s;"></div>
+          </div>
+          <div class="flex justify-between text-xs font-bold text-[#5B4B73] mt-1">
+            <span id="pCorrectCount">0</span><span id="pWrongCount">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAM LAYOUT -->
+    <div id="teamLayout" style="display:none;">
+      <div id="teamLeft">
+        <div style="flex:1;width:100%;display:flex;align-items:center;justify-content:center;position:relative;min-height:0;">
+          <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10;width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:34px solid #E11D48;filter:drop-shadow(0 3px 8px rgba(0,0,0,.3));"></div>
+          <svg id="wheelSvgTeam" viewBox="0 0 500 500" style="width:100%;height:100%;max-width:min(calc(50vw - 2rem),calc(100vh - 220px));max-height:min(calc(50vw - 2rem),calc(100vh - 220px));filter:drop-shadow(0 20px 35px rgba(42,24,92,.22));cursor:pointer;" role="img">
+            <circle cx="250" cy="250" r="235" fill="#FFF4D8" stroke="#24163F" stroke-width="8"/>
+            <g id="sliceGroupTeam"></g>
+            <circle cx="250" cy="250" r="52" fill="#fff" stroke="#24163F" stroke-width="7"/>
+            <text x="250" y="244" text-anchor="middle" font-weight="900" font-size="17" fill="#24163F" font-family="Nunito,sans-serif">SPIN</text>
+            <text x="250" y="262" text-anchor="middle" font-weight="900" font-size="11" fill="#E11D48" font-family="Nunito,sans-serif">TEAM</text>
+          </svg>
+        </div>
+        <div class="flex gap-3 w-full justify-center flex-shrink-0">
+          <button id="spinBtnTeam" class="flex-1 max-w-[200px] inline-flex items-center justify-center gap-2 rounded-2xl border-4 border-[#24163F] bg-[#E11D48] px-6 py-3 font-black text-white shadow-[4px_4px_0_#24163F] transition hover:-translate-y-1 disabled:opacity-50 text-base">
+            🔄 Putar Tim!
+          </button>
+        </div>
+        <!-- Ronde info -->
+        <div class="flex gap-2 flex-wrap justify-center flex-shrink-0">
+          <span class="chip chip-teal">Ronde: <span id="roundCount">1</span></span>
+          <span id="currentTeamChip" class="chip chip-purple hidden">Tim: <span id="currentTeamName">-</span></span>
+        </div>
+      </div>
+      <div id="teamRight">
+        <h2 class="font-black text-sm flex-shrink-0" style="font-family:Fraunces,serif;">🏆 Leaderboard Skor</h2>
+        <div id="leaderboard" class="flex-1 scroll-panel flex flex-col gap-2"></div>
+        <!-- Riwayat jawaban tim -->
+        <div class="rounded-xl border-2 border-[#24163F] bg-white p-3 shadow-[3px_3px_0_#24163F] flex-shrink-0" style="max-height:35%;overflow-y:auto;">
+          <p class="font-black text-xs mb-2">📝 Riwayat Jawaban</p>
+          <div id="teamAnswerLog" class="space-y-1"></div>
+          <div id="teamAnswerEmpty" class="text-xs font-bold text-[#5B4B73] text-center py-2">Belum ada jawaban</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========== QUESTION MODAL ========== -->
+<div id="questionModal" class="fullmodal">
+  <div class="modal-inner">
+    <div id="modalWinnerBar" class="modal-winner-bar personal-bar">
+      <span style="font-size:2rem;">✨</span>
+      <div class="winner-label"><span id="modalWinnerLabel">Giliran</span>: <span id="modalWinnerName">Nama</span></div>
+      <span style="font-size:2rem;">✨</span>
+    </div>
+    <div class="modal-question-bar">
+      <p id="modalQuestionText" class="question-text">Pertanyaan muncul di sini</p>
+    </div>
+    <div class="timer-bar-wrap">
+      <div class="timer-track"><div id="timerFill" class="timer-fill"></div></div>
+      <div id="timerCountdown" class="timer-countdown">60</div>
+    </div>
+    <!-- Rebut bar (team mode) -->
+    <div id="rebutBar">
+      <div id="rebutBtnContainer" class="flex flex-wrap gap-2 items-center justify-center w-full"></div>
+    </div>
+    <div class="modal-options-area">
+      <div id="modalOptionsList" class="options-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== CELEBRATION ========== -->
+<div id="celebrationOverlay">
+  <div id="celebBackdrop" class="celebration-backdrop"></div>
+  <div class="celebration-box">
+    <div id="celebIcon" class="celeb-icon">🎉</div>
+    <div id="celebText" class="celeb-text correct">BENAR!</div>
+    <div id="celebSub" class="celeb-sub correct">Jawaban tepat!</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);z-index:300;display:none;max-width:90%;border-radius:1.25rem;border:3px solid #24163F;background:white;padding:.75rem 1.5rem;font-weight:900;font-size:1rem;color:#24163F;box-shadow:6px 6px 0 #24163F;" role="status"></div>
+
+<script>
+// ========================
+// STATE
+// ========================
+const PALETTE = ["#E11D48","#F97316","#FACC15","#14B8A6","#60A5FA","#A855F7","#FB7185","#34D399","#EF4444","#06B6D4"];
+const TIMER_DURATION = 60;
+
+let gameMode = "personal"; // "personal" | "team"
+let numTeams = 2;
+let teamNames = ["Tim A","Tim B"];
+let students = [], questions = [];
+let usedQuestions = [];
+
+// Personal mode state
+let activeStudents = [], pickedStudents = [], studentAnswers = [];
+let wheelRotationP = 0;
+
+// Team mode state
+let teams = []; // [{name, color, score, members:[]}]
+let activeTeams = []; // indices into teams
+let teamAnswerLog = [];
+let wheelRotationT = 0;
+let currentTeamIdx = -1; // index in activeTeams currently answering
+let currentRebutIdx = -1; // index in activeTeams currently rebuting (-1 = none)
+let round = 1;
+
+let currentQuestion = null;
+let isSpinning = false;
+let timerInterval = null;
+let toastTimer = null;
+
+// ========================
+// SETUP — TABS
+// ========================
+document.querySelectorAll(".tab-btn[data-tab]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn[data-tab]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll(".tab-pane").forEach(p => p.classList.add("hidden"));
+    document.getElementById("tab-" + btn.dataset.tab).classList.remove("hidden");
+  });
+});
+
+// ========================
+// SETUP — MODE SELECT
+// ========================
+document.querySelectorAll(".mode-card").forEach(card => {
+  card.addEventListener("click", () => {
+    document.querySelectorAll(".mode-card").forEach(c => c.classList.remove("selected"));
+    card.classList.add("selected");
+    gameMode = card.dataset.mode;
+    document.getElementById("teamConfig").classList.toggle("hidden", gameMode !== "team");
+    refreshTeamAssignArea();
+    checkStartButton();
+  });
+});
+
+// ========================
+// SETUP — TEAM COUNT
+// ========================
+document.querySelectorAll(".team-count-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".team-count-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    numTeams = parseInt(btn.dataset.n);
+    renderTeamNameInputs();
+    refreshTeamAssignArea();
+  });
+});
+
+function renderTeamNameInputs() {
+  const c = document.getElementById("teamNamesContainer");
+  // preserve existing names
+  while (teamNames.length < numTeams) teamNames.push("Tim " + String.fromCharCode(64 + teamNames.length + 1));
+  teamNames = teamNames.slice(0, numTeams);
+  c.innerHTML = teamNames.map((name, i) => `
+    <div class="flex items-center gap-2">
+      <div class="w-4 h-4 rounded-full flex-shrink-0" style="background:${PALETTE[i]};border:2px solid #24163F;"></div>
+      <input type="text" value="${escHtml(name)}" data-idx="${i}"
+        class="border-2 border-[#24163F] rounded-xl px-3 py-2 font-black text-sm w-32"
+        placeholder="Nama tim ${i+1}">
+    </div>`).join("");
+  c.querySelectorAll("input").forEach(inp => {
+    inp.addEventListener("input", () => {
+      teamNames[parseInt(inp.dataset.idx)] = inp.value || ("Tim " + (parseInt(inp.dataset.idx)+1));
+      refreshTeamAssignArea();
+    });
+  });
+}
+
+renderTeamNameInputs();
+
+// ========================
+// SETUP — STUDENTS
+// ========================
+document.getElementById("studentFile").addEventListener("change", e => {
+  readFile(e.target.files[0], (text) => {
+    const parsed = parseStudents(text);
+    if (!parsed.length) { showToast("Tidak ada nama terbaca"); return; }
+    students = parsed;
+    onStudentsLoaded();
+  });
+  e.target.value = "";
+});
+
+document.getElementById("manualStudentBtn").addEventListener("click", () => {
+  document.getElementById("manualStudentArea").classList.toggle("hidden");
+});
+
+document.getElementById("applyManualStudent").addEventListener("click", () => {
+  const text = document.getElementById("manualStudentText").value;
+  const parsed = parseStudents(text);
+  if (!parsed.length) { showToast("Tidak ada nama terbaca"); return; }
+  students = parsed;
+  onStudentsLoaded();
+  document.getElementById("manualStudentArea").classList.add("hidden");
+});
+
+function onStudentsLoaded() {
+  const preview = document.getElementById("studentPreview");
+  preview.classList.remove("hidden");
+  document.getElementById("studentCountLabel").textContent = `✓ ${students.length} siswa terimport:`;
+  document.getElementById("studentPreviewList").innerHTML = students.map(n => `<span class="chip chip-teal">${escHtml(n)}</span>`).join("");
+  refreshTeamAssignArea();
+  checkStartButton();
+  showToast(`${students.length} siswa terimport!`);
+}
+
+function autoDistributeStudents() {
+  if (!window.studentTeamMap) window.studentTeamMap = {};
+  // shuffle students then assign round-robin
+  const shuffled = [...students].sort(() => Math.random() - 0.5);
+  shuffled.forEach((s, i) => { window.studentTeamMap[s] = i % numTeams; });
+}
+
+function refreshTeamAssignArea() {
+  const area = document.getElementById("teamAssignArea");
+  if (gameMode !== "team" || !students.length) { area.classList.add("hidden"); return; }
+  area.classList.remove("hidden");
+
+  // initialize map if first time (sequential distribution)
+  if (!window.studentTeamMap) window.studentTeamMap = {};
+  students.forEach((s, i) => { if (!(s in window.studentTeamMap)) window.studentTeamMap[s] = i % numTeams; });
+  // ensure any student not yet assigned gets a team (e.g. numTeams changed)
+  students.forEach((s, i) => {
+    if (window.studentTeamMap[s] >= numTeams) window.studentTeamMap[s] = i % numTeams;
+  });
+
+  const grid = document.getElementById("teamCardsGrid");
+  // Build per-team member lists
+  const membersByTeam = Array.from({length: numTeams}, () => []);
+  students.forEach(s => { const t = window.studentTeamMap[s] ?? 0; membersByTeam[t].push(s); });
+
+  grid.innerHTML = Array.from({length: numTeams}, (_, ti) => {
+    const color = PALETTE[ti % PALETTE.length];
+    const members = membersByTeam[ti];
+    const chipsHtml = members.length
+      ? members.map(s => `<span class="student-chip" style="background:${color};" data-student="${escHtml(s)}" data-teamidx="${ti}" title="Klik untuk pindah tim">${escHtml(s)} <span style="opacity:.6;font-size:.8em;">›</span></span>`).join("")
+      : `<span class="student-chip-placeholder">Belum ada anggota</span>`;
+    return `<div class="team-card">
+      <div class="team-card-header" style="background:${color}20;">
+        <div class="team-card-dot" style="background:${color};"></div>
+        <span class="team-card-name">${escHtml(teamNames[ti])}</span>
+        <span class="team-card-count">${members.length} siswa</span>
+      </div>
+      <div class="team-card-body">${chipsHtml}</div>
+    </div>`;
+  }).join("");
+
+  // Click chip → move to next team
+  grid.querySelectorAll(".student-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const s = chip.dataset.student;
+      const cur = parseInt(chip.dataset.teamidx);
+      window.studentTeamMap[s] = (cur + 1) % numTeams;
+      refreshTeamAssignArea();
+    });
+  });
+}
+
+document.getElementById("autoDistributeBtn").addEventListener("click", () => {
+  autoDistributeStudents();
+  refreshTeamAssignArea();
+  showToast("Siswa diacak ulang ke tim!");
+});
+
+// ========================
+// SETUP — QUESTIONS
+// ========================
+document.getElementById("questionFile").addEventListener("change", e => {
+  readFile(e.target.files[0], (text, name) => {
+    const parsed = parseQuestions(text, name);
+    if (!parsed.length) { showToast("Format soal tidak terbaca"); return; }
+    questions = parsed; usedQuestions = [];
+    document.getElementById("questionCountLabel").textContent = `✓ ${questions.length} soal dimuat:`;
+    document.getElementById("questionPreviewList").innerHTML = questions.map((q,i) => `
+      <div class="rounded-xl border-2 border-[#24163F] bg-white p-3">
+        <div class="flex items-start gap-2">
+          <span class="chip chip-gray flex-shrink-0">${i+1}</span>
+          <div>
+            <p class="font-bold text-xs text-[#24163F]">${escHtml(q.question)}</p>
+            <p class="text-xs text-[#5B4B73] mt-1">${q.options.map((o,oi)=>`<span class="mr-2">${String.fromCharCode(65+oi)}. ${escHtml(o)}</span>`).join("")}</p>
+            <p class="text-xs font-black text-[#14B8A6] mt-1">✓ ${escHtml(q.answer)}</p>
+          </div>
+        </div>
+      </div>`).join("");
+    document.getElementById("questionPreview").classList.remove("hidden");
+    checkStartButton();
+    showToast(`${questions.length} soal terimport!`);
+  });
+  e.target.value = "";
+});
+
+function checkStartButton() {
+  const hasStudents = students.length > 0;
+  const hasQuestions = questions.length > 0;
+  const ready = hasStudents && hasQuestions;
+  document.getElementById("startGameBtn").disabled = !ready;
+}
+
+// ========================
+// START GAME
+// ========================
+document.getElementById("startGameBtn").addEventListener("click", () => {
+  if (!students.length || !questions.length) { showToast("Import data terlebih dahulu!"); return; }
+  initGame();
+  document.getElementById("setupPage").classList.remove("active");
+  document.getElementById("gamePage").classList.add("active");
+});
+
+function initGame() {
+  usedQuestions = [];
+  currentQuestion = null;
+
+  if (gameMode === "personal") {
+    activeStudents = [...students];
+    pickedStudents = []; studentAnswers = [];
+    wheelRotationP = 0;
+    document.getElementById("gameModeLabel").textContent = "👤 Personal";
+    document.getElementById("personalLayout").style.display = "flex";
+    document.getElementById("teamLayout").style.display = "none";
+    const svg = document.getElementById("wheelSvgPersonal");
+    svg.style.transition = "none"; svg.style.transform = "rotate(0deg)";
+    renderWheelPersonal();
+    updatePersonalUI();
+  } else {
+    // build team objects
+    teams = teamNames.slice(0, numTeams).map((name, i) => ({
+      name, color: PALETTE[i], score: 0,
+      members: students.filter(s => (window.studentTeamMap?.[s] ?? (students.indexOf(s) % numTeams)) === i)
+    }));
+    activeTeams = teams.map((_,i)=>i);
+    teamAnswerLog = []; round = 1; currentTeamIdx = -1; currentRebutIdx = -1;
+    wheelRotationT = 0;
+    document.getElementById("gameModeLabel").textContent = "🏆 Tim";
+    document.getElementById("personalLayout").style.display = "none";
+    document.getElementById("teamLayout").style.display = "flex";
+    const svg = document.getElementById("wheelSvgTeam");
+    svg.style.transition = "none"; svg.style.transform = "rotate(0deg)";
+    renderWheelTeam();
+    renderLeaderboard();
+    renderTeamAnswerLog();
+    document.getElementById("roundCount").textContent = round;
+    document.getElementById("currentTeamChip").classList.add("hidden");
+  }
+}
+
+// ========================
+// WHEEL — PERSONAL
+// ========================
+function renderWheelPersonal() {
+  const sg = document.getElementById("sliceGroupPersonal");
+  sg.innerHTML = "";
+  if (activeStudents.length === 0) {
+    const c = makeSvgEl("circle"); c.setAttribute("cx","250"); c.setAttribute("cy","250"); c.setAttribute("r","220"); c.setAttribute("fill","#FFE7A8"); c.setAttribute("stroke","#24163F"); c.setAttribute("stroke-width","4"); sg.appendChild(c);
+    const t = makeSvgEl("text"); t.setAttribute("x","250"); t.setAttribute("y","255"); t.setAttribute("text-anchor","middle"); t.setAttribute("font-size","20"); t.setAttribute("font-weight","900"); t.setAttribute("fill","#24163F"); t.textContent = students.length ? "Semua sudah dipilih" : "Import siswa dulu"; sg.appendChild(t);
+    document.getElementById("spinBtnPersonal").disabled = true; return;
+  }
+  drawSlices(sg, activeStudents.map(n=>n));
+  document.getElementById("spinBtnPersonal").disabled = isSpinning;
+}
+
+function spinPersonal() {
+  if (isSpinning || activeStudents.length === 0) return;
+  isSpinning = true;
+  document.getElementById("spinBtnPersonal").disabled = true;
+  const winIdx = Math.floor(Math.random() * activeStudents.length);
+  const sa = 360 / activeStudents.length;
+  const target = 360 - (winIdx * sa + sa/2);
+  wheelRotationP += (4 + Math.floor(Math.random()*3)) * 360 + target;
+  const svg = document.getElementById("wheelSvgPersonal");
+  svg.style.transition = "transform 4s cubic-bezier(.12,.78,.18,1)";
+  svg.style.transform = `rotate(${wheelRotationP}deg)`;
+  setTimeout(() => {
+    const winner = activeStudents[winIdx];
+    activeStudents = activeStudents.filter((_,i) => i !== winIdx);
+    pickedStudents.push(winner);
+    renderWheelPersonal(); updatePersonalUI();
+    pickRandomQuestion();
+    openPersonalModal(winner);
+    isSpinning = false;
+  }, 4200);
+}
+
+document.getElementById("spinBtnPersonal").addEventListener("click", spinPersonal);
+document.getElementById("wheelSvgPersonal").addEventListener("click", () => { if (!isSpinning && activeStudents.length > 0) spinPersonal(); });
+
+document.getElementById("skipBtnPersonal").addEventListener("click", () => {
+  if (isSpinning) return;
+  if (activeStudents.length === 0) { showToast("Semua siswa sudah dipilih!"); return; }
+  // pick random and skip (no question)
+  const winIdx = Math.floor(Math.random() * activeStudents.length);
+  const winner = activeStudents[winIdx];
+  activeStudents = activeStudents.filter((_,i) => i !== winIdx);
+  pickedStudents.push(winner);
+  renderWheelPersonal(); updatePersonalUI();
+  showToast(`${winner} dilewati`);
+});
+
+function updatePersonalUI() {
+  document.getElementById("activeCountP").textContent = activeStudents.length;
+  document.getElementById("pickedCountP").textContent = pickedStudents.length;
+  const list = document.getElementById("personalAnswersList");
+  const empty = document.getElementById("personalAnswersEmpty");
+  if (!studentAnswers.length) { list.innerHTML=""; list.style.display="none"; empty.style.display="flex"; }
+  else {
+    empty.style.display="none"; list.style.display="";
+    list.innerHTML = studentAnswers.map(r => {
+      const ic=r.isCorrect?"✓":"✗"; const bg=r.isCorrect?"#ECFDF5":"#FFF1F2"; const ic_c=r.isCorrect?"#0D9488":"#E11D48"; const border=r.isCorrect?"#6EE7B7":"#FECDD3";
+      return `<div style="background:${bg};border:2px solid ${border};border-radius:.75rem;padding:.5rem .75rem;display:flex;align-items:center;gap:.6rem;">
+        <span style="flex-shrink:0;width:1.6rem;height:1.6rem;border-radius:50%;background:${ic_c};color:white;font-weight:900;font-size:.75rem;display:flex;align-items:center;justify-content:center;">${ic}</span>
+        <div style="flex:1;min-width:0;">
+          <p style="font-weight:900;font-size:.75rem;color:#24163F;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(r.student)}</p>
+          <p style="font-size:.7rem;color:#5B4B73;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(r.answer)}</p>
+        </div>
+      </div>`;
+    }).join("");
+  }
+  const total=studentAnswers.length, correct=studentAnswers.filter(r=>r.isCorrect).length, wrong=total-correct;
+  document.getElementById("pCorrectCount").textContent=correct;
+  document.getElementById("pWrongCount").textContent=wrong;
+  document.getElementById("pScoreBarCorrect").style.width=total?(correct/total*100)+"%":"0%";
+  document.getElementById("pScoreBarWrong").style.width=total?(wrong/total*100)+"%":"0%";
+}
+
+// ========================
+// WHEEL — TEAM
+// ========================
+function renderWheelTeam() {
+  const sg = document.getElementById("sliceGroupTeam");
+  sg.innerHTML = "";
+  const labels = activeTeams.map(i => teams[i].name);
+  const colors = activeTeams.map(i => teams[i].color);
+  if (!labels.length) {
+    const t = makeSvgEl("text"); t.setAttribute("x","250"); t.setAttribute("y","255"); t.setAttribute("text-anchor","middle"); t.setAttribute("font-size","20"); t.setAttribute("font-weight","900"); t.setAttribute("fill","#24163F"); t.textContent = "Semua tim sudah main"; sg.appendChild(t);
+    document.getElementById("spinBtnTeam").disabled = true; return;
+  }
+  drawSlices(sg, labels, colors);
+  document.getElementById("spinBtnTeam").disabled = isSpinning;
+}
+
+function spinTeam() {
+  if (isSpinning || activeTeams.length === 0) return;
+  isSpinning = true;
+  document.getElementById("spinBtnTeam").disabled = true;
+  const winIdx = Math.floor(Math.random() * activeTeams.length);
+  const sa = 360 / activeTeams.length;
+  const target = 360 - (winIdx * sa + sa/2);
+  wheelRotationT += (4 + Math.floor(Math.random()*3)) * 360 + target;
+  const svg = document.getElementById("wheelSvgTeam");
+  svg.style.transition = "transform 4s cubic-bezier(.12,.78,.18,1)";
+  svg.style.transform = `rotate(${wheelRotationT}deg)`;
+  setTimeout(() => {
+    currentTeamIdx = winIdx;
+    const teamRef = teams[activeTeams[winIdx]];
+    document.getElementById("currentTeamChip").classList.remove("hidden");
+    document.getElementById("currentTeamName").textContent = teamRef.name;
+    pickRandomQuestion();
+    openTeamModal(teamRef);
+    isSpinning = false;
+  }, 4200);
+}
+
+document.getElementById("spinBtnTeam").addEventListener("click", spinTeam);
+document.getElementById("wheelSvgTeam").addEventListener("click", () => { if (!isSpinning && activeTeams.length > 0) spinTeam(); });
+
+// ========================
+// LEADERBOARD
+// ========================
+function renderLeaderboard() {
+  const lb = document.getElementById("leaderboard");
+  const sorted = [...teams].sort((a,b)=>b.score-a.score);
+  lb.innerHTML = sorted.map((t, rank) => {
+    const medal = rank===0?"🥇":rank===1?"🥈":rank===2?"🥉":`${rank+1}.`;
+    return `<div class="team-score-card" style="border-color:${t.color};background:${t.color}18;" id="lbcard-${teams.indexOf(t)}">
+      <div class="flex items-center gap-2">
+        <span style="font-size:1.4rem;line-height:1;">${medal}</span>
+        <div>
+          <p class="font-black text-sm" style="color:${t.color}">${escHtml(t.name)}</p>
+          <p class="text-xs font-bold text-[#5B4B73]">${t.members.length} siswa</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <p class="font-black text-2xl" style="color:${t.color};font-family:Fraunces,serif;">${t.score}</p>
+        <p class="text-xs font-bold text-[#5B4B73]">poin</p>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderTeamAnswerLog() {
+  const log = document.getElementById("teamAnswerLog");
+  const empty = document.getElementById("teamAnswerEmpty");
+  if (!teamAnswerLog.length) { log.innerHTML=""; empty.style.display="block"; return; }
+  empty.style.display="none";
+  log.innerHTML = teamAnswerLog.slice().reverse().map(r => {
+    const col = r.isCorrect ? "#14B8A6" : "#E11D48";
+    return `<div style="display:flex;align-items:center;gap:.5rem;padding:.3rem .5rem;border-radius:.5rem;background:${r.isCorrect?"#ECFDF5":"#FFF1F2"};">
+      <span style="font-size:.85rem;">${r.isCorrect?"✓":"✗"}</span>
+      <div style="flex:1;min-width:0;">
+        <p style="font-weight:900;font-size:.7rem;color:${col};margin:0;">${escHtml(r.teamName)}</p>
+        <p style="font-size:.65rem;color:#5B4B73;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(r.answer)}</p>
+      </div>
+      <span style="font-weight:900;font-size:.75rem;color:${col};">${r.isCorrect?"+100":""}</span>
+    </div>`;
+  }).join("");
+}
+
+// ========================
+// MODAL — PERSONAL
+// ========================
+function openPersonalModal(winner) {
+  if (!currentQuestion) { showToast("Tidak ada pertanyaan!"); return; }
+  document.getElementById("modalWinnerLabel").textContent = "Giliran";
+  document.getElementById("modalWinnerName").textContent = winner;
+  document.getElementById("modalWinnerBar").className = "modal-winner-bar personal-bar";
+  document.getElementById("rebutBar").classList.remove("visible");
+  renderOptions((chosen, isCorrect) => {
+    studentAnswers.push({student:winner, question:currentQuestion.question, answer:chosen, correct_answer:currentQuestion.answer, isCorrect});
+    updatePersonalUI();
+    showCelebration(isCorrect, chosen, currentQuestion.answer, () => {
+      document.getElementById("questionModal").classList.remove("open");
+    });
+  });
+  document.getElementById("questionModal").classList.add("open");
+  startTimer(() => {
+    // Timeout in personal mode
+    lockOptions();
+    studentAnswers.push({student:winner, question:currentQuestion.question, answer:"(waktu habis)", correct_answer:currentQuestion.answer, isCorrect:false});
+    updatePersonalUI();
+    showCelebration(false, "(waktu habis)", currentQuestion.answer, () => {
+      document.getElementById("questionModal").classList.remove("open");
+    });
+  });
+}
+
+// ========================
+// MODAL — TEAM
+// ========================
+function openTeamModal(teamRef) {
+  if (!currentQuestion) { showToast("Tidak ada pertanyaan!"); isSpinning=false; return; }
+  currentRebutIdx = -1;
+  document.getElementById("modalWinnerLabel").textContent = "Tim";
+  document.getElementById("modalWinnerName").textContent = teamRef.name;
+  document.getElementById("modalWinnerBar").style.background = `linear-gradient(135deg, ${teamRef.color} 0%, ${teamRef.color}99 100%)`;
+  document.getElementById("modalWinnerBar").className = "modal-winner-bar";
+  document.getElementById("rebutBar").classList.remove("visible");
+  renderOptions((chosen, isCorrect) => {
+    handleTeamAnswer(chosen, isCorrect, teamRef);
+  });
+  document.getElementById("questionModal").classList.add("open");
+  startTimer(() => {
+    // Timeout — team gets wrong
+    lockOptions();
+    teamAnswerLog.push({teamName:teamRef.name, answer:"(waktu habis)", isCorrect:false});
+    renderTeamAnswerLog();
+    showCelebration(false, "(waktu habis)", currentQuestion.answer, () => {
+      document.getElementById("questionModal").classList.remove("open");
+      afterTeamRound();
+    });
+  });
+}
+
+function handleTeamAnswer(chosen, isCorrect, teamRef) {
+  if (isCorrect) {
+    teamRef.score += 100;
+    teamAnswerLog.push({teamName:teamRef.name, answer:chosen, isCorrect:true});
+    renderLeaderboard(); renderTeamAnswerLog();
+    showCelebration(true, chosen, currentQuestion.answer, () => {
+      document.getElementById("questionModal").classList.remove("open");
+      afterTeamRound();
+    });
+  } else {
+    // Wrong — show rebut bar, jangan reveal jawaban benar dulu
+    teamAnswerLog.push({teamName:teamRef.name, answer:chosen, isCorrect:false});
+    renderTeamAnswerLog();
+    stopTimer();
+    // Reset opsi ke netral, BUKAN highlight jawaban benar
+    resetOptionsForRebut();
+    showRebutBar(teamRef);
+  }
+}
+
+function showRebutBar(wrongTeam) {
+  const bar = document.getElementById("rebutBar");
+  const cont = document.getElementById("rebutBtnContainer");
+  // All teams EXCEPT the one who just answered wrong can rebut
+  const otherIdxs = teams.map((_,i)=>i).filter(i => teams[i] !== wrongTeam);
+
+  if (!otherIdxs.length) {
+    // No other teams — show SALAH celebration then close
+    bar.classList.remove("visible");
+    showCelebration(false, "", currentQuestion.answer, () => {
+      document.getElementById("questionModal").classList.remove("open");
+      afterTeamRound();
+    });
+    return;
+  }
+
+  bar.classList.add("visible");
+  cont.innerHTML = `<span style="color:white;font-weight:900;font-size:.85rem;flex-shrink:0;">❗ Jawaban salah! Tim lain bisa rebut:</span>`
+    + otherIdxs.map(ti => {
+      const t = teams[ti];
+      return `<button class="rebut-btn" data-teamidx="${ti}" style="background:${t.color}33;border-color:${t.color};color:white;font-weight:900;">
+        ${escHtml(t.name)} — REBUT!
+      </button>`;
+    }).join("")
+    + `<button class="rebut-btn" id="skipRebutBtn" style="background:#ffffff22;border-color:#ffffff66;color:#aaa;">Lewati</button>`;
+
+  function doRebut(rebutTeamIdx) {
+    bar.classList.remove("visible");
+    const rebutTeam = teams[rebutTeamIdx];
+    document.getElementById("modalWinnerLabel").textContent = "⚡ Rebut — Tim";
+    document.getElementById("modalWinnerName").textContent = rebutTeam.name;
+    document.getElementById("modalWinnerBar").style.background = `linear-gradient(135deg, ${rebutTeam.color} 0%, ${rebutTeam.color}aa 100%)`;
+
+    // Fresh options for rebut team (30s timer)
+    renderOptionsForRebut(rebutTeam);
+
+    startTimerDuration(30, () => {
+      lockOptions();
+      teamAnswerLog.push({teamName:rebutTeam.name, answer:"(waktu habis)", isCorrect:false});
+      renderTeamAnswerLog();
+      showCelebration(false, "(waktu habis)", currentQuestion.answer, () => {
+        document.getElementById("questionModal").classList.remove("open");
+        afterTeamRound();
+      });
+    });
+  }
+
+  cont.querySelectorAll(".rebut-btn[data-teamidx]").forEach(btn => {
+    btn.addEventListener("click", () => doRebut(parseInt(btn.dataset.teamidx)));
+  });
+
+  document.getElementById("skipRebutBtn").addEventListener("click", () => {
+    bar.classList.remove("visible");
+    lockOptions(); // baru reveal jawaban benar saat skip
+    showCelebration(false, "", currentQuestion.answer, () => {
+      document.getElementById("questionModal").classList.remove("open");
+      afterTeamRound();
+    });
+  });
+}
+
+function renderOptionsForRebut(rebutTeam) {
+  // Unlock options and rebind handlers
+  const grid = document.getElementById("modalOptionsList");
+  grid.querySelectorAll(".option-btn").forEach(b => {
+    const cloned = b.cloneNode(true);
+    b.parentNode.replaceChild(cloned, b);
+  });
+  grid.querySelectorAll(".option-btn").forEach(b => {
+    b.disabled = false;
+    b.classList.remove("correct","wrong");
+    b.addEventListener("click", () => {
+      const chosen = b.getAttribute("data-option");
+      const isCorrect = normalizeStr(chosen) === normalizeStr(currentQuestion.answer);
+      markOptions(b, isCorrect);
+      stopTimer();
+      if (isCorrect) {
+        rebutTeam.score += 100;
+        teamAnswerLog.push({teamName:rebutTeam.name, answer:chosen, isCorrect:true});
+      } else {
+        teamAnswerLog.push({teamName:rebutTeam.name, answer:chosen, isCorrect:false});
+      }
+      renderLeaderboard(); renderTeamAnswerLog();
+      showCelebration(isCorrect, chosen, currentQuestion.answer, () => {
+        document.getElementById("questionModal").classList.remove("open");
+        afterTeamRound();
+      });
+    });
+  });
+}
+
+function afterTeamRound() {
+  round++;
+  document.getElementById("roundCount").textContent = round;
+  currentTeamIdx = -1;
+  currentRebutIdx = -1;
+  isSpinning = false;
+  // Reset activeTeams setiap ronde baru agar semua tim bisa diputar lagi
+  activeTeams = teams.map((_,i) => i);
+  const svg = document.getElementById("wheelSvgTeam");
+  svg.style.transition = "none";
+  svg.style.transform = "rotate(0deg)";
+  wheelRotationT = 0;
+  renderWheelTeam();
+  renderLeaderboard();
+  document.getElementById("currentTeamChip").classList.add("hidden");
+}
+
+// ========================
+// RENDER OPTIONS (shared)
+// ========================
+function renderOptions(onAnswer) {
+  if (!currentQuestion) return;
+  const qEl = document.getElementById("modalQuestionText");
+  qEl.textContent = currentQuestion.question;
+  qEl.className = "question-text";
+  applyTextDir(qEl, currentQuestion.question);
+
+  const n = currentQuestion.options.length;
+  const grid = document.getElementById("modalOptionsList");
+  grid.style.gridTemplateColumns = n <= 2 ? "1fr 1fr" : n === 3 ? "1fr 1fr 1fr" : "1fr 1fr";
+
+  const shuffled = [...currentQuestion.options].sort(() => Math.random() - .5);
+  grid.innerHTML = shuffled.map((opt, idx) => {
+    const letter = String.fromCharCode(65+idx);
+    return `<button type="button" class="option-btn" data-option="${escHtml(opt)}">
+      <span class="option-badge">${letter}</span>
+      <span class="option-text">${escHtml(opt)}</span>
+    </button>`;
+  }).join("");
+  grid.querySelectorAll(".option-btn").forEach(btn => {
+    applyTextDir(btn.querySelector(".option-text"), btn.getAttribute("data-option"));
+    btn.addEventListener("click", () => {
+      const chosen = btn.getAttribute("data-option");
+      const isCorrect = normalizeStr(chosen) === normalizeStr(currentQuestion.answer);
+      markOptions(btn, isCorrect);
+      stopTimer();
+      onAnswer(chosen, isCorrect);
+    });
+  });
+}
+
+function markOptions(clickedBtn, isCorrect) {
+  document.getElementById("modalOptionsList").querySelectorAll(".option-btn").forEach(b => {
+    b.disabled = true;
+    if (normalizeStr(b.getAttribute("data-option")) === normalizeStr(currentQuestion.answer)) b.classList.add("correct");
+    else if (b === clickedBtn && !isCorrect) b.classList.add("wrong");
+  });
+}
+
+function lockOptions() {
+  document.getElementById("modalOptionsList").querySelectorAll(".option-btn").forEach(b => {
+    b.disabled = true;
+    if (normalizeStr(b.getAttribute("data-option")) === normalizeStr(currentQuestion.answer)) b.classList.add("correct");
+  });
+}
+
+// Reset opsi ke netral (disable tapi TANPA reveal jawaban benar) — dipakai sebelum rebut
+function resetOptionsForRebut() {
+  document.getElementById("modalOptionsList").querySelectorAll(".option-btn").forEach(b => {
+    b.disabled = true;
+    b.classList.remove("correct", "wrong");
+  });
+}
+
+// ========================
+// TIMER
+// ========================
+function startTimer(onTimeout) {
+  startTimerDuration(TIMER_DURATION, onTimeout);
+}
+
+function startTimerDuration(duration, onTimeout) {
+  stopTimer();
+  let remaining = duration;
+  const fill = document.getElementById("timerFill");
+  const cd = document.getElementById("timerCountdown");
+  fill.style.transition = "none"; fill.style.transform = "scaleX(1)";
+  cd.textContent = remaining; cd.className = "timer-countdown";
+  void fill.offsetWidth;
+  timerInterval = setInterval(() => {
+    remaining--;
+    cd.textContent = remaining;
+    fill.style.transition = "transform 1s linear";
+    fill.style.transform = `scaleX(${remaining/duration})`;
+    if (remaining <= 10) cd.className = "timer-countdown danger";
+    else if (remaining <= Math.floor(duration*0.33)) cd.className = "timer-countdown warning";
+    if (remaining <= 0) { clearInterval(timerInterval); onTimeout(); }
+  }, 1000);
+}
+
+function stopTimer() { clearInterval(timerInterval); }
+
+// ========================
+// CELEBRATION
+// ========================
+function showCelebration(isCorrect, chosen, correctAnswer, callback) {
+  const overlay = document.getElementById("celebrationOverlay");
+  const backdrop = document.getElementById("celebBackdrop");
+  const icon = document.getElementById("celebIcon");
+  const text = document.getElementById("celebText");
+  const sub = document.getElementById("celebSub");
+  if (isCorrect) {
+    backdrop.className="celebration-backdrop correct-bg"; icon.textContent="🎉"; text.textContent="BENAR!"; text.className="celeb-text correct"; sub.textContent="Jawaban tepat! 👏"; sub.className="celeb-sub correct"; spawnConfetti(true);
+  } else {
+    backdrop.className="celebration-backdrop wrong-bg"; icon.textContent="😬"; text.textContent="SALAH!"; text.className="celeb-text wrong"; sub.textContent=`Jawaban: ${correctAnswer}`; sub.className="celeb-sub wrong"; spawnConfetti(false);
+  }
+  overlay.classList.remove("show"); void overlay.offsetWidth; overlay.classList.add("show");
+  setTimeout(() => { overlay.classList.remove("show"); if(callback) callback(); }, 2600);
+}
+
+function spawnConfetti(isCorrect) {
+  const colors = isCorrect ? ["#10B981","#34D399","#6EE7B7","#FDE68A","#A5F3FC","#FACC15"] : ["#F43F5E","#FB7185","#FDA4AF","#FECDD3","#C4B5FD","#818CF8"];
+  for (let i=0;i<70;i++) {
+    setTimeout(()=>{
+      const el=document.createElement("div"); el.className="confetti-piece";
+      const size=8+Math.random()*12;
+      el.style.cssText=`left:${Math.random()*100}vw;top:-${Math.random()*5}vh;width:${size}px;height:${size*(1+Math.random())}px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1.8+Math.random()*2}s;transform:rotate(${Math.random()*360}deg);`;
+      document.body.appendChild(el); setTimeout(()=>el.remove(),4000);
+    },i*25);
+  }
+}
+
+// ========================
+// WHEEL DRAWING HELPERS
+// ========================
+function drawSlices(sg, labels, colors) {
+  const n = labels.length;
+  const sa = 360/n;
+  labels.forEach((name, i) => {
+    const s=i*sa, e=s+sa, mid=s+sa/2;
+    const p = makeSvgEl("path");
+    p.setAttribute("d", describeArc(250,250,222,s,e));
+    p.setAttribute("fill", colors ? colors[i] : PALETTE[i%PALETTE.length]);
+    p.setAttribute("stroke","#24163F"); p.setAttribute("stroke-width","3");
+    sg.appendChild(p);
+    const r = n>10?140:n>6?148:158;
+    const lp = polarToCartesian(250,250,r,mid);
+    const label = makeSvgEl("text");
+    label.setAttribute("x",lp.x); label.setAttribute("y",lp.y);
+    label.setAttribute("fill","#fff");
+    label.setAttribute("font-size",n>12?"11":n>8?"13":"15");
+    label.setAttribute("font-weight","900"); label.setAttribute("text-anchor","middle"); label.setAttribute("font-family","Nunito,sans-serif");
+    label.setAttribute("transform",`rotate(${mid} ${lp.x} ${lp.y})`);
+    label.setAttribute("paint-order","stroke"); label.setAttribute("stroke","rgba(0,0,0,.5)"); label.setAttribute("stroke-width","3");
+    label.style.pointerEvents="none";
+    label.textContent = name.length>12 ? name.substring(0,11)+"…" : name;
+    sg.appendChild(label);
+  });
+}
+
+function polarToCartesian(cx,cy,r,angle){const rad=(angle-90)*Math.PI/180;return{x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)};}
+function describeArc(cx,cy,r,s,e){const st=polarToCartesian(cx,cy,r,e);const en=polarToCartesian(cx,cy,r,s);const laf=e-s<=180?"0":"1";return`M ${cx} ${cy} L ${st.x} ${st.y} A ${r} ${r} 0 ${laf} 0 ${en.x} ${en.y} Z`;}
+function makeSvgEl(tag){return document.createElementNS("http://www.w3.org/2000/svg",tag);}
+
+// ========================
+// QUESTION LOGIC
+// ========================
+function pickRandomQuestion() {
+  if (!questions.length) { currentQuestion=null; return; }
+  if (usedQuestions.length >= questions.length) usedQuestions = [];
+  const avail = questions.map((_,i)=>i).filter(i=>!usedQuestions.includes(i));
+  const pick = avail.length ? avail[Math.floor(Math.random()*avail.length)] : Math.floor(Math.random()*questions.length);
+  currentQuestion = questions[pick];
+  usedQuestions.push(pick);
+}
+
+// ========================
+// GAME CONTROLS
+// ========================
+document.getElementById("resetGameBtn").addEventListener("click", () => {
+  stopTimer(); document.getElementById("questionModal").classList.remove("open");
+  document.getElementById("celebrationOverlay").classList.remove("show");
+  isSpinning=false; initGame(); showToast("Game direset!");
+});
+
+document.getElementById("exitGameBtn").addEventListener("click", () => {
+  stopTimer(); document.getElementById("questionModal").classList.remove("open");
+  document.getElementById("gamePage").classList.remove("active");
+  document.getElementById("setupPage").classList.add("active");
+  isSpinning=false;
+});
+
+document.getElementById("printBtn").addEventListener("click", () => {
+  if (gameMode === "personal") printPersonal();
+  else printTeam();
+});
+
+function printPersonal() {
+  if (!studentAnswers.length) { showToast("Belum ada jawaban!"); return; }
+  const tanggal=new Date().toLocaleDateString("id-ID",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  const rows=studentAnswers.map((r,i)=>`<tr><td>${i+1}</td><td>${escHtml(r.student)}</td><td>${escHtml(r.question)}</td><td class="${r.isCorrect?"benar":"salah"}">${r.isCorrect?"✓ Benar":"✗ Salah"}</td></tr>`).join("");
+  const benar=studentAnswers.filter(r=>r.isCorrect).length;
+  openPrintWindow("📋 Rekap Personal",tanggal,`<table><thead><tr><th>No</th><th>Nama Siswa</th><th>Pertanyaan</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`,benar,studentAnswers.length-benar,studentAnswers.length);
+}
+
+function printTeam() {
+  const tanggal=new Date().toLocaleDateString("id-ID",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  const sorted=[...teams].sort((a,b)=>b.score-a.score);
+  const rows=sorted.map((t,i)=>`<tr><td>${i+1}</td><td><b>${escHtml(t.name)}</b></td><td class="benar">${t.score}</td></tr>`).join("");
+  const logRows=teamAnswerLog.map((r,i)=>`<tr><td>${i+1}</td><td>${escHtml(r.teamName)}</td><td>${escHtml(r.answer)}</td><td class="${r.isCorrect?"benar":"salah"}">${r.isCorrect?"✓ Benar":"✗ Salah"}</td></tr>`).join("");
+  const html=`<h2>🏆 Leaderboard Tim</h2><table><thead><tr><th>Rank</th><th>Tim</th><th>Skor</th></tr></thead><tbody>${rows}</tbody></table><br><h2>📝 Riwayat Jawaban</h2><table><thead><tr><th>No</th><th>Tim</th><th>Jawaban</th><th>Status</th></tr></thead><tbody>${logRows}</tbody></table>`;
+  openPrintWindow("🏆 Rekap Tim",tanggal,html,teamAnswerLog.filter(r=>r.isCorrect).length,teamAnswerLog.filter(r=>!r.isCorrect).length,teamAnswerLog.length);
+}
+
+function openPrintWindow(title,tanggal,tableHtml,benar,salah,total) {
+  const w=window.open("","_blank","width=800,height=700");
+  w.document.write(`<!doctype html><html lang="id"><head><meta charset="UTF-8"><title>${title}</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"Nunito",sans-serif;color:#1a1a2e;padding:2.5rem 3rem;}h1{font-size:1.5rem;font-weight:900;text-align:center;margin-bottom:.25rem;}h2{font-size:1.2rem;font-weight:900;margin:1rem 0 .5rem;}.subtitle{text-align:center;font-size:.85rem;color:#555;margin-bottom:1.25rem;}.stats{display:flex;justify-content:center;gap:2rem;margin-bottom:1.5rem;}.stat-box{border:2px solid #ddd;border-radius:.75rem;padding:.5rem 1.5rem;text-align:center;}.stat-box span{display:block;font-size:1.4rem;font-weight:900;}.stat-box.b span{color:#059669;}.stat-box.s span{color:#E11D48;}.stat-box label{font-size:.7rem;font-weight:800;color:#777;text-transform:uppercase;}table{width:100%;border-collapse:collapse;font-size:.9rem;margin-bottom:1rem;}thead tr{background:#1a1a2e;color:white;}thead th{padding:.6rem .9rem;text-align:left;font-weight:900;}tbody tr:nth-child(even){background:#f9f9fb;}td{padding:.55rem .9rem;border-bottom:1px solid #e8e8f0;}td:first-child{width:2.5rem;text-align:center;font-weight:900;color:#888;}.benar{color:#059669;font-weight:900;}.salah{color:#E11D48;font-weight:900;}</style>
+  </head><body><h1>${title}</h1><p class="subtitle">${tanggal}</p>
+  <div class="stats"><div class="stat-box b"><span>${benar}</span><label>Benar</label></div><div class="stat-box"><span>${total}</span><label>Total</label></div><div class="stat-box s"><span>${salah}</span><label>Salah</label></div></div>
+  ${tableHtml}<script>window.onload=()=>window.print();<\/script></body></html>`);
+  w.document.close();
+}
+
+// ========================
+// ARABIC / MIXED TEXT
+// ========================
+function hasArabic(str){return/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(str);}
+function hasLatin(str){return/[A-Za-z\u00C0-\u024F]/.test(str);}
+function applyTextDir(el,str){if(!el||!str)return;if(hasArabic(str)&&hasLatin(str))el.classList.add("text-mixed");else if(hasArabic(str))el.classList.add("text-arabic");}
+
+// ========================
+// UTILS
+// ========================
+function parseStudents(text){return[...new Set(text.split(/\r?\n|,/).map(s=>s.trim()).filter(Boolean))];}
+function parseQuestions(text,name){
+  const t=text.trim(); if(!t)return[];
+  if(name&&name.toLowerCase().endsWith(".json")){
+    try{const d=JSON.parse(t);if(!Array.isArray(d))return[];return d.map(i=>({question:String(i.question||"").trim(),options:Array.isArray(i.options)?i.options.map(String):[],answer:String(i.answer||"").trim()})).filter(q=>q.question&&q.options.length>=2&&q.answer);}catch{return[];}
+  }
+  return t.split(/\r?\n/).map(line=>{const p=line.split("|").map(s=>s.trim()).filter(Boolean);if(p.length<4)return null;return{question:p[0],options:p.slice(1,-1),answer:p[p.length-1]};}).filter(Boolean);
+}
+function normalizeStr(v){return String(v||"").trim().toLowerCase();}
+function escHtml(v){return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
+function showToast(msg){clearTimeout(toastTimer);const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";t.style.animation="none";void t.offsetWidth;t.style.animation="toastIn .25s ease-out both";toastTimer=setTimeout(()=>{t.style.display="none";},2800);}
+function readFile(file,cb){if(!file)return;const r=new FileReader();r.onload=()=>cb(String(r.result||""),file.name);r.onerror=()=>showToast("Gagal membaca file!");r.readAsText(file);}
+</script>
+</body>
+</html>
