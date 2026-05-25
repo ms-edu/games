@@ -34,7 +34,7 @@
     }
 
     /* =========================
-       HERO
+       HERO HEADER
     ========================= */
 
     .hero{
@@ -140,7 +140,7 @@
 
     .games-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+      grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
       gap:35px;
 
       padding-bottom:80px;
@@ -166,22 +166,58 @@
     }
 
     .game-card:hover{
-      transform:translateY(-8px);
+      transform:translateY(-10px);
     }
 
     .card-top{
-      padding:35px 30px 28px;
+      padding:40px 30px 40px;
+
       color:white;
+
+      position:relative;
+
+      min-height:320px;
+
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
     }
+
+    .card-top::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+      linear-gradient(
+        to top,
+        rgba(0,0,0,.82),
+        rgba(0,0,0,.15)
+      );
+    }
+
+    .card-content{
+      position:relative;
+      z-index:2;
+    }
+
+    /* =========================
+       HERO IMAGE
+    ========================= */
 
     .jeopardy{
       background:
-      linear-gradient(135deg,#4f46e5,#7c3aed);
+      url('https://i.imgur.com/BsWc3pb.png');
+
+      background-size:cover;
+      background-position:center;
     }
 
     .wheel{
       background:
-      linear-gradient(135deg,#ff4d6d,#ff8a00);
+      url('https://i.imgur.com/vBlaQ37.png');
+
+      background-size:cover;
+      background-position:center;
     }
 
     .icon{
@@ -190,7 +226,7 @@
 
       border-radius:26px;
 
-      background:rgba(255,255,255,.18);
+      background:rgba(255,255,255,.16);
 
       display:flex;
       align-items:center;
@@ -201,16 +237,18 @@
       margin-bottom:24px;
 
       backdrop-filter:blur(8px);
+
+      border:2px solid rgba(255,255,255,.2);
     }
 
     .card-top h2{
       font-size:2rem;
-      margin-bottom:10px;
+      margin-bottom:12px;
     }
 
     .card-top p{
       line-height:1.8;
-      opacity:.95;
+      opacity:.96;
     }
 
     .card-body{
@@ -390,16 +428,20 @@
 
         <div class="card-top jeopardy">
 
-          <div class="icon">
-            🧠
+          <div class="card-content">
+
+            <div class="icon">
+              🧠
+            </div>
+
+            <h2>Jeopardy Quiz</h2>
+
+            <p>
+              Game kuis papan kategori ala TV Show untuk pembelajaran
+              kelompok, kompetisi kelas, dan latihan soal interaktif.
+            </p>
+
           </div>
-
-          <h2>Jeopardy Quiz</h2>
-
-          <p>
-            Game kuis papan kategori ala TV Show untuk pembelajaran
-            kelompok, kompetisi kelas, dan latihan soal interaktif.
-          </p>
 
         </div>
 
@@ -440,21 +482,25 @@
 
       </div>
 
-      <!-- WHEEL -->
+      <!-- SPIN WHEEL -->
       <div class="game-card">
 
         <div class="card-top wheel">
 
-          <div class="icon">
-            🎡
+          <div class="card-content">
+
+            <div class="icon">
+              🎡
+            </div>
+
+            <h2>Spin The Wheel</h2>
+
+            <p>
+              Permainan roda putar interaktif untuk memilih tim,
+              siswa, pertanyaan, atau tantangan secara acak dan seru.
+            </p>
+
           </div>
-
-          <h2>Spin The Wheel</h2>
-
-          <p>
-            Permainan roda putar interaktif untuk memilih tim,
-            siswa, pertanyaan, atau tantangan secara acak dan seru.
-          </p>
 
         </div>
 
