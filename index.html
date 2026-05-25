@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>EMES Gameshow</title>
+  <title>Emes EduTech - Gameshow</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+
     *{
       margin:0;
       padding:0;
@@ -17,13 +18,14 @@
 
     body{
       font-family:'Poppins',sans-serif;
+      min-height:100vh;
+      overflow-x:hidden;
+      color:#24123a;
+
       background:
       radial-gradient(circle at top left,#ffe7b8 0%,transparent 30%),
-      radial-gradient(circle at bottom right,#ffd2e1 0%,transparent 30%),
-      #f8f2e4;
-      min-height:100vh;
-      color:#24123a;
-      overflow-x:hidden;
+      radial-gradient(circle at bottom right,#ffd3e2 0%,transparent 30%),
+      #f7f0e2;
     }
 
     .container{
@@ -31,7 +33,9 @@
       margin:auto;
     }
 
-    /* HEADER */
+    /* =========================
+       HERO
+    ========================= */
 
     .hero{
       padding:50px 0 30px;
@@ -40,92 +44,122 @@
     .hero-box{
       background:#fffdf8;
       border:5px solid #2c1648;
-      border-radius:35px;
-      padding:40px;
+      border-radius:36px;
+
+      padding:45px;
+
       display:flex;
-      justify-content:space-between;
       align-items:center;
-      gap:30px;
+      justify-content:space-between;
+      gap:40px;
+
       box-shadow:
       0 14px 0 #2c1648,
-      0 25px 40px rgba(0,0,0,.08);
+      0 28px 40px rgba(0,0,0,.08);
     }
 
     .badge{
       display:inline-flex;
       align-items:center;
       gap:10px;
+
       padding:10px 18px;
-      background:linear-gradient(135deg,#ff8a00,#ff4d6d);
-      color:white;
+
       border-radius:999px;
+
+      background:
+      linear-gradient(135deg,#ff8a00,#ff4d6d);
+
+      color:white;
       font-size:.9rem;
       font-weight:700;
-      margin-bottom:20px;
-      box-shadow:0 8px 18px rgba(255,100,100,.25);
+
+      margin-bottom:22px;
+
+      box-shadow:
+      0 8px 18px rgba(255,100,100,.25);
     }
 
     h1{
-      font-size:clamp(2.4rem,5vw,4rem);
+      font-size:clamp(2.5rem,5vw,4.2rem);
       line-height:1.1;
-      margin-bottom:18px;
       color:#2c1648;
+      margin-bottom:18px;
     }
 
     .hero p{
+      max-width:720px;
+      line-height:1.9;
       font-size:1.05rem;
-      line-height:1.8;
-      color:#5a5370;
-      max-width:700px;
+      color:#5b5470;
     }
 
     .hero-right{
-      min-width:220px;
       display:flex;
-      justify-content:center;
       align-items:center;
+      justify-content:center;
+      min-width:220px;
     }
 
     .logo-circle{
-      width:180px;
-      height:180px;
+      width:190px;
+      height:190px;
+
       border-radius:50%;
+
       background:
       linear-gradient(135deg,#ff4d6d,#ff8a00);
+
       border:8px solid #2c1648;
+
       display:flex;
       align-items:center;
       justify-content:center;
+
+      font-size:3.5rem;
       color:white;
-      font-size:3rem;
-      font-weight:800;
+
       box-shadow:
       0 12px 0 #2c1648,
-      0 20px 30px rgba(0,0,0,.15);
+      0 22px 35px rgba(0,0,0,.16);
     }
 
-    /* GAME GRID */
+    /* =========================
+       SECTION TITLE
+    ========================= */
 
     .section-title{
-      margin:80px 0 25px;
+      margin:85px 0 28px;
       font-size:2rem;
       color:#2c1648;
     }
+
+    /* =========================
+       GRID
+    ========================= */
 
     .games-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
       gap:35px;
+
       padding-bottom:80px;
     }
 
+    /* =========================
+       CARD
+    ========================= */
+
     .game-card{
-      position:relative;
       background:#fffdf8;
+
       border:5px solid #2c1648;
-      border-radius:32px;
+      border-radius:34px;
+
       overflow:hidden;
+
       transition:.25s ease;
+
       box-shadow:
       0 12px 0 #2c1648,
       0 20px 35px rgba(0,0,0,.08);
@@ -136,32 +170,36 @@
     }
 
     .card-top{
-      padding:35px 30px 25px;
-      position:relative;
+      padding:35px 30px 28px;
+      color:white;
     }
 
     .jeopardy{
       background:
       linear-gradient(135deg,#4f46e5,#7c3aed);
-      color:white;
     }
 
     .wheel{
       background:
       linear-gradient(135deg,#ff4d6d,#ff8a00);
-      color:white;
     }
 
     .icon{
-      width:90px;
-      height:90px;
-      border-radius:24px;
+      width:95px;
+      height:95px;
+
+      border-radius:26px;
+
       background:rgba(255,255,255,.18);
+
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:2.8rem;
-      margin-bottom:25px;
+
+      font-size:3rem;
+
+      margin-bottom:24px;
+
       backdrop-filter:blur(8px);
     }
 
@@ -171,7 +209,7 @@
     }
 
     .card-top p{
-      line-height:1.7;
+      line-height:1.8;
       opacity:.95;
     }
 
@@ -179,36 +217,56 @@
       padding:30px;
     }
 
+    /* =========================
+       FEATURES
+    ========================= */
+
     .features{
       display:flex;
       flex-wrap:wrap;
       gap:12px;
-      margin-bottom:30px;
+
+      margin-bottom:32px;
     }
 
     .feature{
       padding:10px 16px;
-      background:#f4eefb;
+
       border-radius:999px;
+
+      background:#f3eefb;
+
+      color:#4c3c67;
+
       font-size:.9rem;
       font-weight:600;
-      color:#4d3b68;
     }
+
+    /* =========================
+       BUTTON
+    ========================= */
 
     .btn{
       width:100%;
+
       display:flex;
       align-items:center;
       justify-content:center;
       gap:12px;
+
       padding:18px;
-      border-radius:18px;
+
+      border-radius:20px;
+
       text-decoration:none;
+
       color:white;
-      font-weight:700;
       font-size:1rem;
-      transition:.2s ease;
+      font-weight:700;
+
       border:4px solid #2c1648;
+
+      transition:.2s ease;
     }
 
     .btn:hover{
@@ -216,31 +274,42 @@
     }
 
     .btn-jeopardy{
-      background:linear-gradient(135deg,#4f46e5,#7c3aed);
+      background:
+      linear-gradient(135deg,#4f46e5,#7c3aed);
     }
 
     .btn-wheel{
-      background:linear-gradient(135deg,#ff4d6d,#ff8a00);
+      background:
+      linear-gradient(135deg,#ff4d6d,#ff8a00);
     }
 
-    /* FOOTER */
+    /* =========================
+       FOOTER
+    ========================= */
 
     footer{
-      padding:30px 0 50px;
+      padding:0 0 50px;
       text-align:center;
-      color:#5a5370;
-      font-weight:500;
     }
 
     .footer-box{
       background:#fffdf8;
+
       border:4px solid #2c1648;
-      border-radius:25px;
+      border-radius:24px;
+
       padding:20px;
-      box-shadow:0 10px 0 #2c1648;
+
+      color:#5a5370;
+      font-weight:600;
+
+      box-shadow:
+      0 10px 0 #2c1648;
     }
 
-    /* RESPONSIVE */
+    /* =========================
+       RESPONSIVE
+    ========================= */
 
     @media(max-width:900px){
 
@@ -254,14 +323,15 @@
       }
 
       .logo-circle{
-        width:140px;
-        height:140px;
-        font-size:2.2rem;
+        width:150px;
+        height:150px;
+        font-size:2.8rem;
       }
 
       .section-title{
         text-align:center;
       }
+
     }
 
   </style>
@@ -278,7 +348,7 @@
         <div class="hero-left">
 
           <div class="badge">
-            🎮 EMES Interactive Gameshow
+            🎮 Emes Interactive Gameshow
           </div>
 
           <h1>
@@ -287,28 +357,32 @@
           </h1>
 
           <p>
-            Platform permainan pembelajaran interaktif untuk kegiatan kuis kelas,
-            cerdas cermat, ice breaking, dan evaluasi siswa dengan tampilan modern,
-            cepat, dan mudah digunakan langsung di kelas.
+            Platform media pembelajaran interaktif untuk kuis kelas,
+            cerdas cermat, ice breaking, evaluasi siswa, dan aktivitas
+            pembelajaran menyenangkan dengan tampilan modern,
+            profesional, cepat, dan mudah digunakan.
           </p>
 
         </div>
 
         <div class="hero-right">
+
           <div class="logo-circle">
             🎯
           </div>
+
         </div>
 
       </div>
 
     </section>
 
-    <!-- GAMES -->
+    <!-- TITLE -->
     <h2 class="section-title">
       Pilih Game Show
     </h2>
 
+    <!-- GAME GRID -->
     <section class="games-grid">
 
       <!-- JEOPARDY -->
@@ -323,8 +397,8 @@
           <h2>Jeopardy Quiz</h2>
 
           <p>
-            Game kuis papan kategori ala TV Show untuk pembelajaran kelompok,
-            kompetisi kelas, dan latihan soal interaktif.
+            Game kuis papan kategori ala TV Show untuk pembelajaran
+            kelompok, kompetisi kelas, dan latihan soal interaktif.
           </p>
 
         </div>
@@ -332,14 +406,31 @@
         <div class="card-body">
 
           <div class="features">
-            <div class="feature">Kategori Soal</div>
-            <div class="feature">Multiplayer</div>
-            <div class="feature">Skor Tim</div>
-            <div class="feature">Interaktif</div>
+
+            <div class="feature">
+              Kategori Soal
+            </div>
+
+            <div class="feature">
+              Multiplayer
+            </div>
+
+            <div class="feature">
+              Skor Tim
+            </div>
+
+            <div class="feature">
+              Interaktif
+            </div>
+
           </div>
 
-          <a class="btn btn-jeopardy"
-             href="https://games.emes.my.id/jeopardy.html">
+          <a
+            class="btn btn-jeopardy"
+            href="https://games.emes.my.id/jeopardy.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
 
             🚀 Mulai Jeopardy
 
@@ -361,8 +452,8 @@
           <h2>Spin The Wheel</h2>
 
           <p>
-            Permainan roda putar interaktif untuk memilih tim, siswa,
-            pertanyaan, atau tantangan secara acak dan seru.
+            Permainan roda putar interaktif untuk memilih tim,
+            siswa, pertanyaan, atau tantangan secara acak dan seru.
           </p>
 
         </div>
@@ -370,14 +461,31 @@
         <div class="card-body">
 
           <div class="features">
-            <div class="feature">Random Picker</div>
-            <div class="feature">Leaderboard</div>
-            <div class="feature">Realtime</div>
-            <div class="feature">Game Kelas</div>
+
+            <div class="feature">
+              Random Picker
+            </div>
+
+            <div class="feature">
+              Leaderboard
+            </div>
+
+            <div class="feature">
+              Realtime
+            </div>
+
+            <div class="feature">
+              Game Kelas
+            </div>
+
           </div>
 
-          <a class="btn btn-wheel"
-             href="https://games.emes.my.id/wheel.html">
+          <a
+            class="btn btn-wheel"
+            href="https://games.emes.my.id/wheel.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
 
             🎯 Mulai Wheel
 
