@@ -936,6 +936,7 @@ function applyTheme(theme) {
   document.querySelectorAll('.theme-dot').forEach(d => {
     d.classList.toggle('active', d.dataset.theme === theme);
   });
+  saveTheme(theme);
 }
 
 // Init theme on load
@@ -1000,6 +1001,92 @@ function generateTeamNames() {
 
 // ============================================================
 //  TEAM COLORS
+// ============================================================
+// ============================================================
+//  LOCALSTORAGE PERSISTENCE
+// ============================================================
+const LS_SETUP   = 'jeopardy_setup_v1';
+const LS_GAME    = 'jeopardy_game_v1';
+const LS_THEME   = 'jeopardy_theme_v1';
+
+function saveSetup() {
+  try {
+    const data = {
+      mapel: document.getElementById('input-mapel').value,
+      kelas: document.getElementById('input-kelas').value,
+      categories: teacherCategories
+    };
+    localStorage.setItem(LS_SETUP, JSON.stringify(data));
+  } catch(e) {}
+}
+
+function loadSetup() {
+  try {
+    const raw = localStorage.getItem(LS_SETUP);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (data.mapel) document.getElementById('input-mapel').value = data.mapel;
+    if (data.kelas) document.getElementById('input-kelas').value = data.kelas;
+    if (Array.isArray(data.categories) && data.categories.length > 0) {
+      teacherCategories = data.categories;
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+function saveGameState() {
+  try {
+    const snap = {
+      teams:           state.teams,
+      activeTeams:     state.activeTeams,
+      currentTurnIdx:  state.currentTurnIdx,
+      round:           state.round,
+      usedCells:       state.usedCells,
+      boardQuestions:  state.boardQuestions,
+      categories:      CATEGORIES,
+      allQuestions:    ALL_QUESTIONS,
+      mapelBar: document.getElementById('game-title-bar') ? document.getElementById('game-title-bar').textContent : '',
+    };
+    localStorage.setItem(LS_GAME, JSON.stringify(snap));
+  } catch(e) {}
+}
+
+function loadGameState() {
+  try {
+    const raw = localStorage.getItem(LS_GAME);
+    if (!raw) return false;
+    const snap = JSON.parse(raw);
+    if (!snap.teams || !snap.activeTeams || !snap.boardQuestions) return false;
+    state.teams          = snap.teams;
+    state.activeTeams    = snap.activeTeams;
+    state.currentTurnIdx = snap.currentTurnIdx;
+    state.round          = snap.round;
+    state.usedCells      = snap.usedCells;
+    state.boardQuestions = snap.boardQuestions;
+    CATEGORIES           = snap.categories;
+    ALL_QUESTIONS        = snap.allQuestions;
+    const bar = document.getElementById('game-title-bar');
+    if (bar && snap.mapelBar) bar.textContent = snap.mapelBar;
+    return true;
+  } catch(e) {}
+  return false;
+}
+
+function clearGameState() {
+  try { localStorage.removeItem(LS_GAME); } catch(e) {}
+}
+
+function saveTheme(theme) {
+  try { localStorage.setItem(LS_THEME, theme); } catch(e) {}
+}
+
+function loadTheme() {
+  try { return localStorage.getItem(LS_THEME) || 'samudra'; } catch(e) { return 'samudra'; }
+}
+
+// ============================================================
+//  TEAM COLORS (must come after persistence fns)
 // ============================================================
 const TEAM_COLORS = ['#ff5555','#55aaff','#ffcc00','#ff66cc','#ff9933','#aa88ff','#00ddcc','#ff6600'];
 
@@ -1110,6 +1197,27 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ============================================================
+//  RESUME / DISCARD
+// ============================================================
+function resumeGame() {
+  const banner = document.getElementById('resume-banner');
+  if (banner) banner.remove();
+  if (loadGameState()) {
+    showScreen('game-screen');
+    renderBoard();
+    renderScoresBar();
+    renderTeamsBottom();
+    updateTurnIndicator();
+  }
+}
+
+function discardResume() {
+  clearGameState();
+  const banner = document.getElementById('resume-banner');
+  if (banner) banner.remove();
+}
+
+// ============================================================
 //  TEACHER SETUP STATE
 // ============================================================
 let teacherCategories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
@@ -1197,6 +1305,7 @@ function renderQuestions(catIdx) {
 function setAnswer(catIdx, qIdx, choiceIdx) {
   teacherCategories[catIdx].questions[qIdx].answer = choiceIdx;
   renderQuestions(catIdx);
+  saveSetup();
 }
 
 function addQuestion(catIdx) {
@@ -1204,6 +1313,7 @@ function addQuestion(catIdx) {
     q: '', choices: ['','','',''], answer: 0
   });
   renderQuestions(catIdx);
+  saveSetup();
   // Scroll to bottom of q-list
   const qList = document.getElementById(`q-list-${catIdx}`);
   if (qList) qList.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1212,12 +1322,14 @@ function addQuestion(catIdx) {
 function removeQuestion(catIdx, qIdx) {
   teacherCategories[catIdx].questions.splice(qIdx, 1);
   renderQuestions(catIdx);
+  saveSetup();
 }
 
 function addCategory() {
   const newId = 'cat_' + Date.now();
   teacherCategories.push({ id: newId, emoji: '📖', label: 'KATEGORI BARU', questions: [] });
   renderTeacherCats();
+  saveSetup();
   // Open the new cat
   const newIdx = teacherCategories.length - 1;
   toggleCat(newIdx);
@@ -1229,6 +1341,7 @@ function removeCategory(catIdx) {
   if (!confirm('Hapus kategori ini beserta semua soalnya?')) return;
   teacherCategories.splice(catIdx, 1);
   renderTeacherCats();
+  saveSetup();
 }
 
 // ============================================================
@@ -1259,8 +1372,9 @@ document.getElementById('json-file-input').addEventListener('change', function(e
       if (Array.isArray(data.categories)) {
         teacherCategories = data.categories;
         renderTeacherCats();
-        document.getElementById('teacher-validation').textContent = '✅ Import berhasil!';
-        setTimeout(() => document.getElementById('teacher-validation').textContent = '', 2000);
+        saveSetup();
+        document.getElementById('teacher-validation').textContent = '✅ Import berhasil! Data tersimpan otomatis.';
+        setTimeout(() => document.getElementById('teacher-validation').textContent = '', 2500);
       }
     } catch(err) {
       document.getElementById('teacher-validation').textContent = '❌ File JSON tidak valid!';
@@ -1412,7 +1526,50 @@ const state = {
 // ============================================================
 const DEFAULT_TEAMS = ['Tim Merah','Tim Biru'];
 function initSetup() {
+  // Restore theme
+  const savedTheme = loadTheme();
+  applyTheme(savedTheme);
+
+  // Restore setup data (categories, mapel, kelas)
+  const restored = loadSetup();
   renderTeacherCats();
+
+  // If there's a saved game in progress, offer to resume
+  if (localStorage.getItem(LS_GAME)) {
+    const resumeBanner = document.createElement('div');
+    resumeBanner.id = 'resume-banner';
+    resumeBanner.style.cssText = `
+      position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+      background:rgba(0,20,40,0.95);border:2px solid var(--teal);
+      border-radius:14px;padding:14px 22px;z-index:9999;
+      display:flex;align-items:center;gap:14px;
+      box-shadow:0 4px 24px rgba(0,0,0,0.7);font-family:'Cairo',sans-serif;
+    `;
+    resumeBanner.innerHTML = `
+      <span style="font-size:1.4rem">🎮</span>
+      <span style="color:#fff;font-size:0.95rem">Ada permainan yang belum selesai.</span>
+      <button onclick="resumeGame()" style="
+        padding:8px 18px;border-radius:8px;border:none;
+        background:var(--teal);color:var(--teal-dark);
+        font-family:'Cairo',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;">
+        ▶ Lanjutkan
+      </button>
+      <button onclick="discardResume()" style="
+        padding:8px 14px;border-radius:8px;
+        border:1px solid rgba(255,255,255,0.2);background:transparent;
+        color:rgba(255,255,255,0.6);font-family:'Cairo',sans-serif;font-size:0.85rem;cursor:pointer;">
+        Buang
+      </button>
+    `;
+    document.body.appendChild(resumeBanner);
+  }
+
+  if (restored) {
+    const msg = document.getElementById('teacher-validation');
+    msg.style.color = 'var(--teal)';
+    msg.textContent = '✅ Data soal sebelumnya berhasil dimuat dari penyimpanan.';
+    setTimeout(() => { msg.textContent = ''; msg.style.color = ''; }, 3000);
+  }
 }
 
 function addTeam(name = '') {
@@ -1443,6 +1600,7 @@ function startGame() {
   state.currentTurnIdx = 0;
   state.round          = 0;
   state.usedCells      = {};
+  clearGameState(); // fresh start removes old saved game
   buildGameData();
   showScreen('game-screen');
   startRound();
@@ -1487,6 +1645,7 @@ function startRound() {
   renderScoresBar();
   renderTeamsBottom();
   updateTurnIndicator();
+  saveGameState();
 }
 
 // ============================================================
@@ -1666,6 +1825,7 @@ function closeQuestion() {
   renderScoresBar();
   renderTeamsBottom();
   updateTurnIndicator();
+  saveGameState();
   checkRoundEnd();
 }
 
@@ -1734,6 +1894,7 @@ function showFinalWinner(winnerIdx) {
   document.getElementById('final-winner-name').textContent = `🥇 ${t.name} 🥇`;
   document.getElementById('final-winner-name').style.color = t.color;
   document.getElementById('final-score-display').textContent = `Total Skor: ${t.score} Poin`;
+  clearGameState(); // game over — remove saved game
   showScreen('final-screen');
 }
 
@@ -1768,6 +1929,23 @@ function showScreen(id) {
 
 // Init
 initSetup();
+
+// Debounced autosave for mapel/kelas fields
+let _saveSetupTimer = null;
+function debouncedSaveSetup() {
+  clearTimeout(_saveSetupTimer);
+  _saveSetupTimer = setTimeout(saveSetup, 600);
+}
+document.getElementById('input-mapel').addEventListener('input', debouncedSaveSetup);
+document.getElementById('input-kelas').addEventListener('input', debouncedSaveSetup);
+
+// Debounced autosave for dynamically-rendered question/category text inputs
+// (cat-list uses event delegation since inputs are created dynamically)
+let _saveCatTimer = null;
+document.getElementById('cat-list').addEventListener('input', function() {
+  clearTimeout(_saveCatTimer);
+  _saveCatTimer = setTimeout(saveSetup, 800);
+});
 </script>
 </body>
 </html>
